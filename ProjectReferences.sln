@@ -5,6 +5,15 @@ VisualStudioVersion = 16.0.29911.98
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectReferencesTool", "ProjectReferencesTool\ProjectReferencesTool.csproj", "{2B363992-96AE-4945-98CB-6A547831AE9D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolInterfaces", "ToolInterfaces\ToolInterfaces.csproj", "{4F2986F4-9935-425E-86B0-639A4EBA699A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolModules", "ToolModules\ToolModules.csproj", "{F6C5ECBE-D30E-4474-BF5E-578C06483631}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".InstallHelp", ".InstallHelp", "{F0618388-5A9A-4B62-908C-0E7A871D204F}"
+	ProjectSection(SolutionItems) = preProject
+		ProjectReferencesTool\InstallNuGet.config = ProjectReferencesTool\InstallNuGet.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +24,14 @@ Global
 		{2B363992-96AE-4945-98CB-6A547831AE9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B363992-96AE-4945-98CB-6A547831AE9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B363992-96AE-4945-98CB-6A547831AE9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F2986F4-9935-425E-86B0-639A4EBA699A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F2986F4-9935-425E-86B0-639A4EBA699A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F2986F4-9935-425E-86B0-639A4EBA699A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F2986F4-9935-425E-86B0-639A4EBA699A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6C5ECBE-D30E-4474-BF5E-578C06483631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6C5ECBE-D30E-4474-BF5E-578C06483631}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6C5ECBE-D30E-4474-BF5E-578C06483631}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6C5ECBE-D30E-4474-BF5E-578C06483631}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

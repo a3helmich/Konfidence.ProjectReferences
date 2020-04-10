@@ -14,7 +14,7 @@ namespace ProjectReferencesTool
                 basePath = args[0];
             }
 
-            var projectReader = new ProjectReader();
+            var projectReader = new ProjectReferencesEngine();
 
             projectReader.Execute(basePath);
         }

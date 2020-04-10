@@ -12,4 +12,15 @@
     <AssemblyName>ProjectReferences</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ToolModules\ToolModules.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="InstallNuGet.config">
+      <Link>..\NuGet.config</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
