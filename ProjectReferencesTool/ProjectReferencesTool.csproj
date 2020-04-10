@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackAsTool>true</PackAsTool>
+    <Authors>Adrie Helmich</Authors>
+    <Company>Konfidence in it</Company>
+    <Product>Project Reference Checker</Product>
+    <PackageId>ProjectReferences</PackageId>
+    <AssemblyName>ProjectReferences</AssemblyName>
+  </PropertyGroup>
+
+</Project>

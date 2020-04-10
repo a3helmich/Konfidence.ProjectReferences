@@ -1,0 +1,22 @@
+﻿using System;
+using System.Linq;
+
+namespace ProjectReferencesTool
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var basePath = ".";
+
+            if (args.Any())
+            {
+                basePath = args[0];
+            }
+
+            var projectReader = new ProjectReader();
+
+            projectReader.Execute(basePath);
+        }
+    }
+}

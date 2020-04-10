@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ProjectReferencesTool": {
+      "commandName": "Project",
+      "commandLineArgs": "..\\..\\.."
+    }
+  }
+}
