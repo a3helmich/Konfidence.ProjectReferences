@@ -8,8 +8,8 @@
     <Authors>Adrie Helmich</Authors>
     <Company>Konfidence in it</Company>
     <Product>Project Reference Checker</Product>
-    <PackageId>ProjectReferences</PackageId>
-    <AssemblyName>ProjectReferences</AssemblyName>
+    <PackageId>Project-References</PackageId>
+    <AssemblyName>Project-References</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
