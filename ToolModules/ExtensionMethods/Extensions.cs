@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using ToolInterfaces;
 
-namespace ToolModules
+namespace ToolModules.ExtensionMethods
 {
     public static class Extensions
     {
@@ -16,14 +15,13 @@ namespace ToolModules
             return text.EndsWith(trimEnd) ? text[..^trimEnd.Length].TrimEnd() : text;
         }
 
-
         public static void ReadProjectLines(this IDotnetProject dotnetProject)
         {
             using var sr = new StreamReader(dotnetProject.Name);
 
             string line;
 
-            while ((line = sr.ReadLine()) != null)
+            while (!(line = sr.ReadLine()).IsEof())
             {
                 dotnetProject.ProjectLines.Add(line);
             }
@@ -36,8 +34,10 @@ namespace ToolModules
 
             var projectLines = dotnetProject.ProjectLines;
 
-            dotnetProject.IsSdkProject = projectLines.FirstOrDefault(line => line.ToLowerInvariant().StartsWith(project)
-                                                           && line.ToLowerInvariant().TrimStart(project).StartsWith(sdk)) != null;
+            dotnetProject.IsSdkProject = projectLines
+                .FirstOrDefault(line => line.ToLowerInvariant().StartsWith(project) 
+                                        && line.ToLowerInvariant().TrimStart(project).StartsWith(sdk))
+                .IsAssigned();
         }
     }
 }

@@ -5,19 +5,22 @@ using System.IO;
 using System.Linq;
 using ToolInterfaces;
 using ToolModules;
+using ToolModules.ExtensionMethods;
 
 namespace ProjectReferencesTool
 {
     public class ProjectReferencesEngine
     {
         private string _basePath = string.Empty;
-        private ProjectReader _projectReader = new ProjectReader();
+        private readonly ProjectReader _projectReader = new ProjectReader();
 
         public void Execute(string basePath)
         {
             if (!Directory.Exists(basePath))
             {
                 Console.WriteLine($@"Path not found: {basePath}");
+
+                return;
             }
 
             _basePath = basePath;

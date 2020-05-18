@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".InstallHelp", ".InstallHel
 		ProjectReferencesTool\InstallNuGet.config = ProjectReferencesTool\InstallNuGet.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectBinaryReferencesTool", "ProjectBinaryReferencesTool\ProjectBinaryReferencesTool.csproj", "{34A0120A-00FB-4388-9F4B-D940C8497951}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{F6C5ECBE-D30E-4474-BF5E-578C06483631}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6C5ECBE-D30E-4474-BF5E-578C06483631}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6C5ECBE-D30E-4474-BF5E-578C06483631}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34A0120A-00FB-4388-9F4B-D940C8497951}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34A0120A-00FB-4388-9F4B-D940C8497951}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34A0120A-00FB-4388-9F4B-D940C8497951}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34A0120A-00FB-4388-9F4B-D940C8497951}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
