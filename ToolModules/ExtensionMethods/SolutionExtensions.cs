@@ -19,13 +19,22 @@ namespace ToolModules.ExtensionMethods
             }
         }
 
-        public static string GetProjectString(this string line)
+        public static string GetProjectIdString(this string line)
         {
             var lineParts = line
                 .Split(new[] {"="}, StringSplitOptions.RemoveEmptyEntries)
                 .TrimList();
 
             return lineParts[0].TrimStart("Project(\"").TrimEnd("\")");
+        }
+
+        public static string GetProjectString(this string line)
+        {
+            var lineParts = line
+                .Split(new[] { "=" }, StringSplitOptions.RemoveEmptyEntries)
+                .TrimList();
+
+            return lineParts[1];//.TrimStart("Project(\"").TrimEnd("\")");
         }
     }
 }

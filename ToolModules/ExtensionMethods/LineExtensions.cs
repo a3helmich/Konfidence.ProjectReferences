@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -169,6 +170,12 @@ namespace ToolModules.ExtensionMethods
             }
 
             return searchLine;
+        }
+
+        public static void WriteLine(this string line)
+        {
+            Console.WriteLine(line);
+            Debug.WriteLine($"=> {line}");
         }
     }
 }

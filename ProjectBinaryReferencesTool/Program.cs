@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using ToolModules.ExtensionMethods;
 
 namespace ProjectBinaryReferencesTool
 {
@@ -18,12 +19,12 @@ namespace ProjectBinaryReferencesTool
                 }
                 else
                 {
-                    Console.WriteLine("not found : solution file");
+                    "not found : solution file".WriteLine();
                 }
             }
             else
             {
-                Console.WriteLine("no argument: solution file");
+                "no argument: solution file".WriteLine();
             }
 
             if (string.IsNullOrWhiteSpace(solutionFile))

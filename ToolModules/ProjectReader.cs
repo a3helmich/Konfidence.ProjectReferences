@@ -12,10 +12,10 @@ namespace ToolModules
     {
         private string _basePath;
 
-        public List<IDotnetProject> SdkProjects = new List<IDotnetProject>();
-        public List<IDotnetProject> FrameworkProjects = new List<IDotnetProject>();
+        public List<IDotNetProject> SdkProjects = new List<IDotNetProject>();
+        public List<IDotNetProject> FrameworkProjects = new List<IDotNetProject>();
 
-        public Dictionary<string, IDotnetProject> ProjectLookup;
+        public Dictionary<string, IDotNetProject> ProjectLookup;
 
         public void ReadProjects(string basePath)
         {
@@ -31,7 +31,7 @@ namespace ToolModules
         }
 
 
-        private void FillProjectsCollections(List<IDotnetProject> allProjects)
+        private void FillProjectsCollections(List<IDotNetProject> allProjects)
         {
             ProjectLookup = allProjects.ToDictionary(project => project.Name);
 
@@ -39,9 +39,9 @@ namespace ToolModules
             FrameworkProjects = allProjects.Where(x => !x.IsSdkProject).ToList();
         }
 
-        private static IDotnetProject BuildSdkProject(string name)
+        private static IDotNetProject BuildSdkProject(string projectName)
         {
-            var sdkProject = new DotnetProject(name);
+            var sdkProject = new DotNetProject(projectName);
 
             sdkProject.ReadProjectLines();
 

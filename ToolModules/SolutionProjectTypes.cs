@@ -8,6 +8,7 @@ namespace ToolModules
     public class SolutionProjectTypes
     {
         public static Dictionary<string, ProjectType> ProjectTypes;
+        public static Dictionary<string, ProjectType> ProjectTypesByName;
 
         static SolutionProjectTypes()
         {
@@ -71,7 +72,9 @@ namespace ToolModules
                 new ProjectType("XNA(Zune)", "{D399B71A-8929-442a-A9AC-8BEC78BB2433}")
             };
 
-            ProjectTypes = projecTypeList.ToDictionary(x => x.ProjectGuidString);
+            ProjectTypes = projecTypeList.ToDictionary(x => x.ProjectTypeGuid);
+
+            ProjectTypesByName = projecTypeList.ToDictionary(x => x.Name);
         }
     }
 }

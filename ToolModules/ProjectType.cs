@@ -6,25 +6,25 @@ namespace ToolModules
 {
     public class ProjectType
     {
-        public string ProjectGuidString { get; }
-        public Guid ProjectGuid { get; }
+        public string ProjectTypeGuid { get; }
+        public Guid ProjectTypeId { get; }
 
         public string Name { get; }
 
-        public ProjectType(string name, string projectGuidString)
+        public ProjectType(string name, string projectTypeGuid)
         {
-            ProjectGuidString = projectGuidString;
+            ProjectTypeGuid = projectTypeGuid;
 
             Name = name;
 
-            if (Guid.TryParse(projectGuidString, out var projectGuid))
+            if (Guid.TryParse(projectTypeGuid, out var projectGuid))
             {
-                ProjectGuid = projectGuid;
+                ProjectTypeId = projectGuid;
 
                 return;
             }
 
-            throw new FormatException($"{name}:{projectGuidString}");
+            throw new FormatException($"{name}:{projectTypeGuid}");
         }
     }
 }

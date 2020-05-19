@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ToolInterfaces
 {
-    public interface IDotnetProject
+    public interface IDotNetProject
     {
         string Name { get; }
         bool SubReferencesResolved { get; set; } 
@@ -12,8 +12,8 @@ namespace ToolInterfaces
 
         bool IsSdkProject { get; set; }
 
-        List<IDotnetProject> ReferencedProjects { get; set; }
-        List<IDotnetProject> SubReferencedProjects { get; set; } 
-        List<IDotnetProject> RedundantReferencedProjects { get; set; }
+        List<IDotNetProject> ReferencedProjects { get; set; }
+        List<IDotNetProject> SubReferencedProjects { get; set; } 
+        List<IDotNetProject> RedundantReferencedProjects { get; set; }
     }
 }

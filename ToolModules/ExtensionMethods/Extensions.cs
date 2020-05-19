@@ -15,7 +15,12 @@ namespace ToolModules.ExtensionMethods
             return text.EndsWith(trimEnd) ? text[..^trimEnd.Length].TrimEnd() : text;
         }
 
-        public static void ReadProjectLines(this IDotnetProject dotnetProject)
+        public static string TrimQuotes(this string text)
+        {
+            return text.TrimStart("\"").TrimEnd("\"");
+        }
+
+        public static void ReadProjectLines(this IDotNetProject dotnetProject)
         {
             using var sr = new StreamReader(dotnetProject.Name);
 
@@ -27,7 +32,7 @@ namespace ToolModules.ExtensionMethods
             }
         }
 
-        public static void SetIsSdkProject(this IDotnetProject dotnetProject)
+        public static void SetIsSdkProject(this IDotNetProject dotnetProject)
         {
             const string project = @"<project ";
             const string sdk = @"sdk=";

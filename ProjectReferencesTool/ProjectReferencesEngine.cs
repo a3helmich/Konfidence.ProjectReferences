@@ -18,7 +18,7 @@ namespace ProjectReferencesTool
         {
             if (!Directory.Exists(basePath))
             {
-                Console.WriteLine($@"Path not found: {basePath}");
+                $@"Path not found: {basePath}".WriteLine();
 
                 return;
             }
@@ -41,20 +41,20 @@ namespace ProjectReferencesTool
 
             foreach (var smellyProject in smellyProjects)
             {
-                Console.WriteLine($@"{smellyProject.Name.TrimStart(_basePath)}");
-                Debug.WriteLine($@"{smellyProject.Name.TrimStart(_basePath)}");
+                $@"{smellyProject.Name.TrimStart(_basePath)}".WriteLine();
+
                 sw.WriteLine($@"{smellyProject.Name.TrimStart(_basePath)}");
 
                 foreach (var smellyProjectRedundantReferencedProject in smellyProject.RedundantReferencedProjects)
                 {
-                    Console.WriteLine($@"{tab} - {smellyProjectRedundantReferencedProject.Name.TrimStart(_basePath)}");
-                    Debug.WriteLine($@"{tab} - {smellyProjectRedundantReferencedProject.Name.TrimStart(_basePath)}");
+                    $@"{tab} - {smellyProjectRedundantReferencedProject.Name.TrimStart(_basePath)}".WriteLine();
+                  
                     sw.WriteLine($@"{tab} - {smellyProjectRedundantReferencedProject.Name.TrimStart(_basePath)}");
                 }
             }
         }
 
-        private static void ExtendProjectsWithReferences(IEnumerable<IDotnetProject> allProjects, Dictionary<string, IDotnetProject> projectLookup)
+        private static void ExtendProjectsWithReferences(IEnumerable<IDotNetProject> allProjects, Dictionary<string, IDotNetProject> projectLookup)
         {
             foreach (var project in allProjects)
             {
@@ -88,7 +88,7 @@ namespace ProjectReferencesTool
             return projectReferences;
         }
 
-        private static void CollectAllSubReferences(IEnumerable<IDotnetProject> allProjectsWithReferences)
+        private static void CollectAllSubReferences(IEnumerable<IDotNetProject> allProjectsWithReferences)
         {
             foreach (var sdkProject in allProjectsWithReferences)
             {
@@ -98,9 +98,9 @@ namespace ProjectReferencesTool
             }
         }
 
-        private static IEnumerable<IDotnetProject> CollectSubReferences(IDotnetProject dotnetProject)
+        private static IEnumerable<IDotNetProject> CollectSubReferences(IDotNetProject dotnetProject)
         {
-            var collection = new List<IDotnetProject>();
+            var collection = new List<IDotNetProject>();
 
             foreach (var referencedSdkProject in dotnetProject.ReferencedProjects)
             {
@@ -117,7 +117,7 @@ namespace ProjectReferencesTool
             return collection.Distinct().ToList();
         }
 
-        private static void CollectAllRedundantReferences(IEnumerable<IDotnetProject> allProjects)
+        private static void CollectAllRedundantReferences(IEnumerable<IDotNetProject> allProjects)
         {
             foreach (var sdkProject in allProjects)
             {
