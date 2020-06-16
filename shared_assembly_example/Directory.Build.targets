@@ -1,0 +1,30 @@
+<Project>
+
+  <Target Name="PidfGeneration" AfterTargets="Build" Condition="'$(CreatePIDF)'=='true'">
+   <Message Importance="high" Text="$(PluginUtilCommand) /c:$(OutputPath)../netcoreapp3.1/$(AssemblyName).pidf /a:$(OutputPath)$(AssemblyName).dll" />
+   <Exec Command="$(PluginUtilCommand) /c:$(OutputPath)../netcoreapp3.1/$(AssemblyName).pidf /a:$(OutputPath)$(AssemblyName).dll" />
+  </Target>
+
+  <ItemGroup>
+     <Compile Include="$(MSBuildThisFileDirectory)SharedAssemblyInfo.cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+     <Compile Remove="**/AssemblyInfo.cs" Visible="false" />
+     <Compile Remove="**/Properties/AssemblyInfo.cs" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="GenerateSpecFlowAssemblyHooksFileTask" Condition="'$(CustomGenerateSpecFlowAssemblyHooksFile)' == 'true' AND '$(_SpecFlow_Tools_MsBuild_Generation_Imported)' == 'true'">
+    <PropertyGroup>
+      <GeneratedSpecFlowAssemblyHooksFile>$([MSBuild]::Unescape('$(IntermediateOutputPath)'))MSTest.AssemblyHooks$(DefaultLanguageSourceExtension)</GeneratedSpecFlowAssemblyHooksFile>
+    </PropertyGroup>
+    
+    <Message Importance="High" Text="Generating specflow assembly hooks file: $(GeneratedSpecFlowAssemblyHooksFile)"/>
+
+    <ReplaceTokenInFileTask Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'" InputFile="$(SourceSpecFlowAssemblyHooksFile)" OutputFile="$(GeneratedSpecFlowAssemblyHooksFile)" TextToReplace="PROJECT_ROOT_NAMESPACE" TextToReplaceWith="$(_SpecFlow_EffectiveRootNamespace.Replace('.', '_'))" />
+    <ItemGroup Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'">
+      <Compile Include="$(GeneratedSpecFlowAssemblyHooksFile)"/>
+    </ItemGroup>
+  </Target>
+
+</Project>
