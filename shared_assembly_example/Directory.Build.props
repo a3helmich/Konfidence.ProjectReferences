@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
       <Version>2020.1.0</Version>
+	  
       <Authors>Konfidence in it</Authors>
       <Copyright>Copyright 2020 Konfidence in it.</Copyright>
       <AssemblyCompany>Konfidence in it</AssemblyCompany>
