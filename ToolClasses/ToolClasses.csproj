@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
+    <PackageReference Include="Konfidence.BaseClasses" Version="2021.1.46" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ToolInterfaces\ToolInterfaces.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,39 +1,34 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using ToolModules.ExtensionMethods;
+using JetBrains.Annotations;
+using ToolClasses;
+using ToolClasses.ExtensionMethods;
 
 namespace ProjectBinaryReferencesTool
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main([NotNull] string[] args)
         {
-            var solutionFile = string.Empty;
-
-            if (args.Any())
-            {
-                if (File.Exists(args[0]))
-                {
-                    solutionFile = args[0];
-                }
-                else
-                {
-                    "not found : solution file".WriteLine();
-                }
-            }
-            else
+            if (!args.Any())
             {
                 "no argument: solution file".WriteLine();
+
+                return;
             }
 
-            if (string.IsNullOrWhiteSpace(solutionFile))
+            var solutionFile = args[0];
+
+            if (!File.Exists(solutionFile) || string.IsNullOrWhiteSpace(solutionFile))
             {
-                Environment.Exit(-1);
+                $"not found : solution file - '{solutionFile}'".WriteLine();
+
+                return;
             }
 
-            var solutionBinaryReferencesEngine = new SolutionBinaryReferencesEngine();
-
+            var solutionBinaryReferencesEngine = new BinaryReferencesEngine();
+            
             solutionBinaryReferencesEngine.Execute(solutionFile);
         }
     }

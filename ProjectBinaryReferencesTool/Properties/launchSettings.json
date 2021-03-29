@@ -2,7 +2,7 @@
   "profiles": {
     "ProjectBinaryReferencesTool": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Builds\\Main_BatchServer\\JewelEarth\\JewelApps\\JewelSuiteBatchServer\\JewelSuiteBatchServer.sln"
+      "commandLineArgs": "C:\\Projects\\Producten\\ProjectReferences\\ProjectReferences.sln"
     }
   }
 }

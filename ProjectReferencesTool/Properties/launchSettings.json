@@ -2,7 +2,7 @@
   "profiles": {
     "ProjectReferencesTool": {
       "commandName": "Project",
-      "commandLineArgs": "c:\\builds\\BatchServerLinux\\ ..\\..\\.."
+      "commandLineArgs": "C:\\Projects\\Producten\\ProjectReferences"
     }
   }
 }

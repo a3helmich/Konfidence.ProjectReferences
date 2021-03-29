@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "rd-deep": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Test\""
+    }
+  }
+}

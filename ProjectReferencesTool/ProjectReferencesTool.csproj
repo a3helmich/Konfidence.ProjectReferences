@@ -13,7 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ToolModules\ToolModules.csproj" />
+    <PackageReference Include="Konfidence.BaseClasses" Version="2021.1.46" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ToolClasses\ToolClasses.csproj" />
   </ItemGroup>
 
   <ItemGroup>
