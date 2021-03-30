@@ -35,9 +35,13 @@ namespace ToolClasses
             if (!projectsWithRedundantReferences.Any())
             {
                 "No redundant project references found.".WriteLine();
+
+                return;
             }
 
             using var sw = new StreamWriter(@".\redundant.txt");
+
+            "Redundant project references:".WriteLine();
 
             foreach (var projectWithRedundantReferences in projectsWithRedundantReferences)
             {
@@ -52,6 +56,8 @@ namespace ToolClasses
                     sw.WriteLine(line);
                 }
             }
+
+            "See => 'redundant.txt'".WriteLine();
         }
     }
 }

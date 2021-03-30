@@ -1,7 +1,5 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Annotations;
-using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
 using ToolClasses.Solutions;

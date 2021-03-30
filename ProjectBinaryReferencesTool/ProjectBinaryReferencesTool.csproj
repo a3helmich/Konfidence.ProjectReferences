@@ -3,6 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackAsTool>true</PackAsTool>
+
+    <Product>Project Binary Reference Checker</Product>
+    <PackageId>Project-BinaryReferences</PackageId>
+    <AssemblyName>Project-BinaryReferences</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

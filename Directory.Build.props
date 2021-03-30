@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup>
+    <Version>2021.1.0</Version>
+    
+    <Authors>Adrie Helmich.</Authors>
+    <Copyright>Konfidence in it 2021.</Copyright>
+    <Company>Konfidence in it.</Company>
+    <AssemblyCompany>Konfidence in it.</AssemblyCompany>
+    
+    <LangVersion>latest</LangVersion>
+
+    <ComVisible>False</ComVisible>
+    <CLSCompliant>False</CLSCompliant>
+    <AssemblyCulture>en</AssemblyCulture>
+
+    <PackageOutputPath>$(SolutionDir)nuget</PackageOutputPath>
+
+    <PackageTags>Konfidence;project reference</PackageTags>
+    <Description>tools for resolving redundant references</Description>
+  </PropertyGroup>
+</Project>

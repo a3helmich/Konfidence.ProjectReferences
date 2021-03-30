@@ -23,7 +23,7 @@ namespace ToolClasses.ExtensionMethods
         }
 
         [NotNull]
-        private static IDotNetProject ReadProjectLines([NotNull] this IDotNetProject dotNetProject)
+        internal static IDotNetProject ReadProjectLines([NotNull] this IDotNetProject dotNetProject)
         {
             using var sr = new StreamReader(dotNetProject.FileName);
 
@@ -38,7 +38,7 @@ namespace ToolClasses.ExtensionMethods
         }
 
         [NotNull]
-        private static IDotNetProject SetProjectProperties([NotNull] this IDotNetProject dotNetProject)
+        internal static IDotNetProject SetProjectProperties([NotNull] this IDotNetProject dotNetProject)
         {
             const string project = @"<project ";
             const string sdk = @"sdk=";
@@ -59,7 +59,7 @@ namespace ToolClasses.ExtensionMethods
         }
 
         [NotNull]
-        private static IDotNetProject BuildProjectReferences([NotNull] this IDotNetProject dotNetProject)
+        internal static IDotNetProject BuildProjectReferences([NotNull] this IDotNetProject dotNetProject)
         {
             var projectPath = Path.GetDirectoryName(dotNetProject.FileName) ?? string.Empty;
 
@@ -74,25 +74,6 @@ namespace ToolClasses.ExtensionMethods
                 .Select(projectName => Path.GetFullPath(Path.Combine(projectPath, projectName))));
 
             return dotNetProject;
-        }
-
-        [NotNull]
-        public static IEnumerable<string> GetProjectsReferences([NotNull] this IDotNetProject dotNetProject)
-        {
-            var projectPath = Path.GetDirectoryName(dotNetProject.FileName) ?? string.Empty;
-
-            var projectReferences = dotNetProject.ProjectLines
-                .Where(line => line.StartsWith(@"<ProjectReference Include=", StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            projectReferences = projectReferences
-                .Select(line => line.TrimStartIgnoreCase(@"<ProjectReference Include="))
-                .Select(line => line.TrimEnd(@"/>").TrimEnd(@">"))
-                .Select(line => line.TrimQuotes())
-                .Select(projectName => Path.GetFullPath(Path.Combine(projectPath, projectName)))
-                .ToList();
-
-            return projectReferences;
         }
 
         [NotNull]
