@@ -10,23 +10,12 @@ namespace ProjectReferencesTool
     {
         static void Main([NotNull] string[] args)
         {
-            var basePath = ".";
+            var (solutionFile, basePath) = ArgumentParser.ParseArguments(args);
 
-            if (args.Any())
-            {
-                basePath = args[0];
-            }
+            ArgumentParser.ValidateArguments(args, basePath, solutionFile);
 
-            if (!Directory.Exists(basePath))
-            {
-                $@"Path not found: {basePath}".WriteLine();
-
-                return;
-            }
-
-            var projectReferencesEngine = new ProjectReferencesEngine();
-
-            projectReferencesEngine.Execute(basePath);
+            new ProjectReferencesEngine()
+                .Execute(solutionFile, basePath);
         }
     }
 }

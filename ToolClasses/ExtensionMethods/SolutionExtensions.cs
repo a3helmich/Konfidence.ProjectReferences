@@ -15,7 +15,7 @@ namespace ToolClasses.ExtensionMethods
         [NotNull]
         public static ISolution ReadSolutionLines([NotNull] this ISolution solution)
         {
-            using var sr = new StreamReader(solution.SolutionFile);
+            using var sr = new StreamReader(Path.Combine(solution.SolutionPath, solution.SolutionFile));
 
             string line;
 
