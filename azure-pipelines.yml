@@ -31,6 +31,8 @@ steps:
     projects: '**\*.sln'
     arguments: '-c $(BuildConfiguration) --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
 
+- template: GenerateAndPublishCodeCoverage.yml@templates  
+
 #Task group has not been exported, task groups are not supported yet ================ start 
 # - script: 'reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines;Cobertura'
 #   displayName: 'Command Line Script generate code coverage'
