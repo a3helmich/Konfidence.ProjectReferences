@@ -1,0 +1,64 @@
+name: .NET
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+  steps:
+  
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore'
+    inputs:
+      command: restore
+      projects: '**\*.sln'
+      feedsToUse: config
+      nugetConfigPath: .nuget/NuGet.Config
+      verbosityRestore: Normal
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build'
+    inputs:
+      projects: '**\*.sln'
+      arguments: '-c $(BuildConfiguration) --no-restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet test'
+    inputs:
+      command: test
+      projects: '**\*.sln'
+      arguments: '-c $(BuildConfiguration) --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+
+  #Task group has not been exported, task groups are not supported yet ================ start 
+  - script: 'reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines;Cobertura'
+    displayName: 'Command Line Script generate code coverage'
+    continueOnError: true
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage from $(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
+      reportDirectory: '$(Build.SourcesDirectory)/CodeCoverage'
+  #Task group has not been exported, task groups are not supported yet ================ end
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet pack'
+    inputs:
+      command: pack
+      packagesToPack: '**\*.sln'
+      nobuild: true
+      verbosityPack: Normal
+
+  - task: CopyFiles@2
+    displayName: 'Copy Files to: \\konfidence8\publish'
+    inputs:
+      SourceFolder: '$(Build.ArtifactStagingDirectory)'
+      TargetFolder: '\\konfidence8\publish'
+
