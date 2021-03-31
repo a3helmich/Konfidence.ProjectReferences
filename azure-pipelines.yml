@@ -1,6 +1,13 @@
 pool:
   name: Default
 
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: Konfidence/yaml.Templates
+      ref: refs/heads/main
+
 steps:
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
