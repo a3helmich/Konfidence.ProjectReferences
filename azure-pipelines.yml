@@ -4,7 +4,7 @@ pool:
 resources:
   repositories:
     - repository: templates
-      type: github
+      type:  git
       name: Konfidence/yaml.Templates
       ref: refs/heads/main
 
