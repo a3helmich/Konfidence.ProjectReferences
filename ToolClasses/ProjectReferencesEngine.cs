@@ -1,23 +1,32 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
-using ToolInterfaces;
+using ToolClasses.Solutions;
 
 namespace ToolClasses
 {
     public class ProjectReferencesEngine
     {
         private ProjectReader _projectReader;
+        private SolutionReader _solutionReader;
 
-        public void Execute(string basePath)
+        public void Execute([NotNull] string solutionFile, [NotNull] string basePath)
         {
+            if (solutionFile.IsAssigned())
+            {
+                _solutionReader = new SolutionReader(Path.Combine(basePath, solutionFile));
+
+                _solutionReader.Execute();
+            }
+
             _projectReader = new ProjectReader(basePath);
 
-            var projectNames = _projectReader.GetFullProjectNames();
+            var projectNames = _solutionReader.IsAssigned()
+                ? _solutionReader.GetFullProjectNames()
+                : _projectReader.GetFullProjectNames();
 
             _projectReader
                 .Execute(projectNames)

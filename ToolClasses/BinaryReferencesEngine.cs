@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using JetBrains.Annotations;
+using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
 using ToolClasses.Solutions;
@@ -8,40 +11,46 @@ namespace ToolClasses
 {
     public class BinaryReferencesEngine
     {
+        private ProjectReader _projectReader;
         private SolutionReader _solutionReader;
 
-        public void Execute([NotNull] string solutionFile)
+        public void Execute([NotNull] string solutionFile, [NotNull] string basePath)
         {
-            _solutionReader = new SolutionReader(solutionFile);
+            if (solutionFile.IsAssigned())
+            {
+                _solutionReader = new SolutionReader(Path.Combine(basePath, solutionFile));
 
-            _solutionReader.Execute();
+                _solutionReader.Execute();
+            }
 
-            var projectNames = _solutionReader.GetFullProjectNames();
+            _projectReader = new ProjectReader(basePath);
 
-            var _projectReader = new ProjectReader(_solutionReader.SolutionPath);
+            var projectNames = _solutionReader.IsAssigned()
+                ? _solutionReader.GetFullProjectNames()
+                : _projectReader.GetFullProjectNames();
 
             _projectReader
                 .Execute(projectNames)
-                .ExtendProjectsWithSolutionProjects(_solutionReader.Solution.SolutionProjects)
+                .ExtendProjectsWithSolutionProjects(_solutionReader?.Solution?.SolutionProjects)
                 .ExtendProjectsWithBinaryReferences();
 
-            if (_projectReader.SdkProjects.Any(x => x.BinaryReferencedProjects.Any()))
+            if (!_projectReader.SdkProjects.Any(x => x.BinaryReferencedProjects.Any()))
             {
-                "Projects referencing other projects as a binary file:".WriteLine();
-
-                foreach (var sdkProject in _projectReader.SdkProjects)
-                {
-                    foreach (var binaryReferencedProject in sdkProject.BinaryReferencedProjects)
-                    {
-                        $"\tproject = {sdkProject.FileName}".WriteLine();
-                        $"\t\treference = {binaryReferencedProject.AssemblyName}.dll".WriteLine();
-                    }
-                }
+                "All clear.".WriteLine();
 
                 return;
             }
 
-            "All clear.".WriteLine();
+            "Projects referencing other projects as a binary file:".WriteLine();
+
+            foreach (var sdkProject in _projectReader.SdkProjects)
+            {
+                foreach (var binaryReferencedProject in sdkProject.BinaryReferencedProjects)
+                {
+                    $"\tproject = {sdkProject.FileName}".WriteLine();
+                    $"\t\treference = {binaryReferencedProject.AssemblyName}.dll".WriteLine();
+                }
+            }
         }
     }
 }

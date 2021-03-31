@@ -64,6 +64,11 @@ namespace ToolClasses.ExtensionMethods
         [NotNull]
         public static ProjectReader ExtendProjectsWithSolutionProjects([NotNull] this ProjectReader projectReader, List<ISolutionProject> solutionProjects)
         {
+            if (!solutionProjects.IsAssigned() || !solutionProjects.Any())
+            {
+                return projectReader;
+            }
+
             foreach (var sdkProject in projectReader.SdkProjects)
             {
                 var solutionProject = solutionProjects.FirstOrDefault(x => x.ProjectFileName == sdkProject.FileName);

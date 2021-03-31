@@ -2,8 +2,10 @@
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using Konfidence.Base;
 using ToolClasses;
 using ToolClasses.ExtensionMethods;
+using ToolInterfaces;
 
 namespace ProjectBinaryReferencesTool
 {
@@ -11,25 +13,12 @@ namespace ProjectBinaryReferencesTool
     {
         static void Main([NotNull] string[] args)
         {
-            if (!args.Any())
-            {
-                "no argument: solution file".WriteLine();
+            var (solutionFile, basePath) = ArgumentParser.ParseArguments(args);
 
-                return;
-            }
+            ArgumentParser.ValidateArguments(args, basePath, solutionFile);
 
-            var solutionFile = args[0];
-
-            if (!File.Exists(solutionFile) || string.IsNullOrWhiteSpace(solutionFile))
-            {
-                $"not found : solution file - '{solutionFile}'".WriteLine();
-
-                return;
-            }
-
-            var solutionBinaryReferencesEngine = new BinaryReferencesEngine();
-            
-            solutionBinaryReferencesEngine.Execute(solutionFile);
+            new BinaryReferencesEngine()
+                .Execute(solutionFile, basePath);
         }
     }
 }

@@ -19,9 +19,9 @@ namespace ToolClasses.Solutions
 
         public Solution([NotNull] string solutionFile)
         {
-            SolutionFile = solutionFile;
-
             SolutionPath = Path.GetDirectoryName(solutionFile);
+
+            SolutionFile = Path.GetFileName(solutionFile);
 
             SolutionLines = new List<string>();
 
