@@ -41,7 +41,14 @@ namespace ToolClasses
                 return;
             }
 
-            "Projects referencing other projects as a binary file:".WriteLine();
+            if (solutionFile.IsAssigned())
+            {
+                $"Projects referencing other projects as a binary file in solution '{solutionFile}':".WriteLine();
+            }
+            else
+            {
+                "Projects referencing other projects as a binary file:".WriteLine();
+            }
 
             foreach (var sdkProject in _projectReader.SdkProjects)
             {

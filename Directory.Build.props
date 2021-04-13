@@ -4,8 +4,8 @@
     
     <Authors>Adrie Helmich.</Authors>
     <Copyright>Konfidence in it 2021.</Copyright>
-    <Company>Konfidence in it.</Company>
-    <AssemblyCompany>Konfidence in it.</AssemblyCompany>
+    <Company>Konfidence in it</Company>
+    <AssemblyCompany>Konfidence in it</AssemblyCompany>
     
     <LangVersion>latest</LangVersion>
 
@@ -15,7 +15,13 @@
 
     <PackageOutputPath>$(SolutionDir)nuget</PackageOutputPath>
 
-    <PackageTags>Konfidence;project reference</PackageTags>
-    <Description>tools for resolving redundant references</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/a3helmich/Konfidence.ProjectReferences</PackageProjectUrl>
+
+    <RepositoryUrl>https://github.com/a3helmich/Konfidence.ProjectReferences</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 </Project>

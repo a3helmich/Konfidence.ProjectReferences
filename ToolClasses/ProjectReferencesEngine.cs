@@ -50,7 +50,14 @@ namespace ToolClasses
 
             using var sw = new StreamWriter(@".\redundant.txt");
 
-            "Redundant project references:".WriteLine();
+            if (solutionFile.IsAssigned())
+            {
+                $"Redundant project references in solution '{solutionFile}':".WriteLine();
+            }
+            else
+            {
+                "Redundant project references:".WriteLine();
+            }
 
             foreach (var projectWithRedundantReferences in projectsWithRedundantReferences)
             {

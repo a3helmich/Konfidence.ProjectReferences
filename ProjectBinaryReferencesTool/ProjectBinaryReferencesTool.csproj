@@ -2,14 +2,20 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>net5.0;netcoreapp3.1;netcoreapp2.1</TargetFrameworks>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackAsTool>true</PackAsTool>
 
     <Product>Project Binary Reference Checker</Product>
-    <PackageId>Project-BinaryReferences</PackageId>
+    <PackageId>Konfidence.Project-BinaryReferences</PackageId>
     <AssemblyName>Project-BinaryReferences</AssemblyName>
+    
+    <Title>Project-BinaryReferences</Title>
+    <Description>Tool for resolving conflicting project and binary references in a solution</Description>
+
+    <PackageTags>project reference binary</PackageTags>
+
   </PropertyGroup>
 
   <ItemGroup>
