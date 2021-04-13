@@ -4,8 +4,7 @@ pool:
 trigger:
     branches:
         exclude:
-        - develop
-
+        - *
 
 resources:
   repositories:
