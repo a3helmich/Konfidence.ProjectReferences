@@ -1,6 +1,9 @@
 pool:
   name: Default
 
+trigger:
+- develop
+
 resources:
   repositories:
     - repository: templates
