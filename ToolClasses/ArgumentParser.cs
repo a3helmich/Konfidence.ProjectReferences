@@ -49,30 +49,41 @@ namespace ToolClasses
 
         public static void ValidateArguments([NotNull] string[] args, [NotNull] string basePath, [NotNull] string solutionFile)
         {
-            if (!File.Exists(Path.Combine(basePath, solutionFile)) || !Directory.Exists(basePath) || !args.Any())
+            if (solutionFile.IsAssigned() && File.Exists(Path.Combine(basePath, solutionFile)))
             {
-                if (!File.Exists(Path.Combine(basePath, solutionFile)))
-                {
-                    $"not found : solution file - '{Path.Combine(basePath, solutionFile)}'".WriteLine();
-                }
-
-                if (!solutionFile.IsAssigned() && !Directory.Exists(basePath))
-                {
-                    $"not found : path - '{basePath}'".WriteLine();
-                }
-
-                new string('=', 78).WriteLine();
-
-                $"valid arguments : [PathOrSolutionName] [--{Arguments.Path}=={Arguments.Path}] [--{Arguments.Solution}=={Arguments.Solution}]"
-                    .WriteLine();
-                "All arguments are mutually exclusive".WriteLine();
-
-                "PathOrSolutionName : lets see where we get with just a Path or a SolutionName.".WriteLine();
-                $"{Arguments.Path} : path where to look for .csproj files, recursively".WriteLine();
-                $"{Arguments.Solution} : the solutionfile [with path] to parse to get the .csproj files".WriteLine();
-
-                Environment.Exit(1);
+                return;
             }
+
+            if (!solutionFile.IsAssigned() && Directory.Exists(basePath))
+            {
+                return;
+            }
+
+            if (!args.Any())
+            {
+                return;
+            }
+
+            if (!Directory.Exists(basePath))
+            {
+                $"not found : path - '{basePath}'".WriteLine();
+            }
+
+            if (solutionFile.IsAssigned() && Directory.Exists(basePath) && !File.Exists(Path.Combine(basePath, solutionFile)))
+            {
+                $"not found : solution file - '{Path.Combine(basePath, solutionFile)}'".WriteLine();
+            }
+
+            new string('=', 78).WriteLine();
+
+            $"valid arguments : [PathOrSolutionName] [--{Arguments.Path}=={Arguments.Path}] [--{Arguments.Solution}=={Arguments.Solution}]".WriteLine();
+            "All arguments are mutually exclusive".WriteLine();
+
+            "PathOrSolutionName : lets see where we get with just a Path or a SolutionName.".WriteLine();
+            $"{Arguments.Path} : path where to look for .csproj files, recursively".WriteLine();
+            $"{Arguments.Solution} : the solutionfile [with path] to parse to get the .csproj files".WriteLine();
+
+            Environment.Exit(1);
         }
     }
 }

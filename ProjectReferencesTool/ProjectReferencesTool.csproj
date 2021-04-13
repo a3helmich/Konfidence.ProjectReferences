@@ -2,27 +2,24 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>net5.0;netcoreapp3.1;netcoreapp2.1</TargetFrameworks>
+
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackAsTool>true</PackAsTool>
+
     <Product>Project Reference Checker</Product>
-    <PackageId>Project-References</PackageId>
+    <PackageId>Konfidence.Project-References</PackageId>
     <AssemblyName>Project-References</AssemblyName>
+
+    <Title>Project-References</Title>
+    <Description>Tool for resolving redundant project references.</Description>
+
+    <PackageTags>project reference redundant</PackageTags>
+
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Konfidence.BaseClasses" Version="2021.1.46" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ToolClasses\ToolClasses.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="InstallNuGet.config">
-      <Link>..\NuGet.config</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

@@ -7,11 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectReferencesTool", "Pr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolInterfaces", "ToolInterfaces\ToolInterfaces.csproj", "{4F2986F4-9935-425E-86B0-639A4EBA699A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".InstallHelp", ".InstallHelp", "{F0618388-5A9A-4B62-908C-0E7A871D204F}"
-	ProjectSection(SolutionItems) = preProject
-		ProjectReferencesTool\InstallNuGet.config = ProjectReferencesTool\InstallNuGet.config
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectBinaryReferencesTool", "ProjectBinaryReferencesTool\ProjectBinaryReferencesTool.csproj", "{34A0120A-00FB-4388-9F4B-D940C8497951}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "rd-deep", "rd-deep\rd-deep.csproj", "{7A08B1E1-3566-45A9-90F7-35EA6AD92870}"
@@ -25,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
+		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
