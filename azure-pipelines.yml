@@ -2,7 +2,9 @@ pool:
   name: Default
 
 trigger:
-- develop
+    branches:
+        exclude:
+        - '*'
 
 resources:
   repositories:
