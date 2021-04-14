@@ -1,10 +1,15 @@
 pool:
   name: Default
 
-trigger:
-    branches:
-        exclude:
-        - '*'
+trigger: none
+
+schedules:
+- cron: "0 3 * * *"
+  displayName: nightly build
+  branches:
+    include: 
+    - develop
+  always: true
 
 resources:
   repositories:
