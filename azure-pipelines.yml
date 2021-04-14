@@ -7,7 +7,8 @@ schedules:
 - cron: "0 3 * * *"
   displayName: nightly build
   branches:
-    include: - develop
+    include: 
+    - develop
   always: true
 
 resources:
