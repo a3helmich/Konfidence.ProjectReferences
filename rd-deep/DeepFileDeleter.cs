@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace rd_deep
 {
@@ -38,7 +38,6 @@ namespace rd_deep
             Debug.WriteLine($"it took {duration.TotalMilliseconds} ms to delete {totalFiles} files");
         }
 
-        [NotNull]
         private List<string> DeleteAllFolders([NotNull] string folderName, out int totalFiles)
         {
             var folders = Directory.GetDirectories(folderName).ToList();
