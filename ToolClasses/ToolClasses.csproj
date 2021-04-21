@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
     <PackageReference Include="Konfidence.BaseClasses" Version="2021.1.48" />
   </ItemGroup>
 
