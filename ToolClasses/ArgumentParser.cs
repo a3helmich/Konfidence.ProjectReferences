@@ -76,7 +76,7 @@ namespace ToolClasses
 
             new string('=', 78).WriteLine();
 
-            $"valid arguments : [PathOrSolutionName] [--{Arguments.Path}=={Arguments.Path}] [--{Arguments.Solution}=={Arguments.Solution}]".WriteLine();
+            $"valid arguments : [PathOrSolutionName] [--{Arguments.Path}={Arguments.Path}] [--{Arguments.Solution}={Arguments.Solution}]".WriteLine();
             "All arguments are mutually exclusive".WriteLine();
 
             "PathOrSolutionName : lets see where we get with just a Path or a SolutionName.".WriteLine();
