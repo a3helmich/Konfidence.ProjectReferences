@@ -10,7 +10,7 @@ namespace rd_deep
         static void Main([NotNull] string[] args)
         {
 
-            if (args.Length == 0)
+            if (!args.Any())
             {
                 Console.WriteLine("no arguments provided.");
 
