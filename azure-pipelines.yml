@@ -20,9 +20,9 @@ resources:
 
 variables:
   solution: '**/*.sln'
-- group: nuget.org-apikeys
-- name: NuGetApiKey
-  value: $[variables.NuGetApiKey]
+#- group: nuget.org-apikeys
+#- name: NuGetApiKey
+#  value: $[variables.NuGetApiKey]
   
 steps:
 - task: DotNetCoreCLI@2
@@ -63,9 +63,9 @@ steps:
     SourceFolder: '$(Build.ArtifactStagingDirectory)'
     TargetFolder: '\\konfidence8\publish'
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet publish nuget.org package'
-  inputs:
-    command: custom
-    custom: nuget
-    arguments: 'push $(Build.ArtifactStagingDirectory)\*.*nupkg -s https://api.nuget.org/v3/index.json -k $(NuGetApiKey) --skip-duplicate'
+#- task: DotNetCoreCLI@2
+#  displayName: 'dotnet publish nuget.org package'
+#  inputs:
+#    command: custom
+#    custom: nuget
+#    arguments: 'push $(Build.ArtifactStagingDirectory)\*.*nupkg -s https://api.nuget.org/v3/index.json -k $(NuGetApiKey) --skip-duplicate'
