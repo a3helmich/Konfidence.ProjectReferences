@@ -22,11 +22,11 @@ variables:
   - name: solution
     value: '**/*.sln'
   - group: nuget.org-apikeys
-  - name: NuGetApiKey
+  - name: vNuGetApiKey
     value: $[variables.NuGetApiKey]
   
 steps:
-- script: echo My Nuget key is $(NuGetApiKey).
+- script: echo My Nuget key is $(vNuGetApiKey).
   displayName: 'show apikey'
   
 - task: DotNetCoreCLI@2
@@ -72,4 +72,4 @@ steps:
   inputs:
     command: custom
     custom: nuget
-    arguments: 'push $(Build.ArtifactStagingDirectory)\Konfidence.Project-References.*.nupkg -s https://api.nuget.org/v3/index.json -k $(NuGetApiKey) --skip-duplicate'
+    arguments: 'push $(Build.ArtifactStagingDirectory)\Konfidence.Project-References.*.nupkg -s https://api.nuget.org/v3/index.json -k $(vNuGetApiKey) --skip-duplicate'
