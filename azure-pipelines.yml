@@ -21,9 +21,9 @@ resources:
 variables:
   - name: solution
     value: '**/*.sln'
-#- group: nuget.org-apikeys
-#- name: NuGetApiKey
-#  value: $[variables.NuGetApiKey]
+  - group: nuget.org-apikeys
+  - name: NuGetApiKey
+    value: $[variables.NuGetApiKey]
   
 steps:
 - task: DotNetCoreCLI@2
