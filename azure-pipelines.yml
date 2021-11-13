@@ -72,4 +72,4 @@ steps:
   inputs:
     command: custom
     custom: nuget
-    arguments: 'push $(Build.ArtifactStagingDirectory)\*.nupkg -s https://api.nuget.org/v3/index.json -k $(NuGetApiKey) --skip-duplicate'
+    arguments: 'push $(Build.ArtifactStagingDirectory)\Konfidence.Project-References.*.nupkg -s https://api.nuget.org/v3/index.json -k $(NuGetApiKey) --skip-duplicate'
