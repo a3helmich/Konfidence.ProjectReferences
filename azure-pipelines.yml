@@ -19,7 +19,8 @@ resources:
       ref: refs/heads/main
 
 variables:
-  solution: '**/*.sln'
+  - name: solution
+    value: '**/*.sln'
 #- group: nuget.org-apikeys
 #- name: NuGetApiKey
 #  value: $[variables.NuGetApiKey]
