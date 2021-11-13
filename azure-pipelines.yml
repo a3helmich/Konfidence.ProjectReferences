@@ -14,16 +14,22 @@ schedules:
 resources:
   repositories:
     - repository: templates
-      type:  git
+      type: git
       name: Konfidence/yaml.Templates
       ref: refs/heads/main
 
+variables:
+  solution: '**/*.sln'
+#- group: nuget.org-apikeys
+#- name: NuGetApiKey
+#  value: $[variables.NuGetApiKey]
+  
 steps:
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:
     command: restore
-    projects: '**\*.sln'
+    projects: '$(solution)'
     feedsToUse: config
     nugetConfigPath: .nuget/NuGet.Config
     verbosityRestore: Normal
@@ -31,14 +37,14 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: 'dotnet build'
   inputs:
-    projects: '**\*.sln'
+    projects: '$(solution)'
     arguments: '-c $(BuildConfiguration) --no-restore'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
   inputs:
     command: test
-    projects: '**\*.sln'
+    projects: '$(solution)'
     arguments: '-c $(BuildConfiguration) --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
 
 - template: GenerateAndPublishCodeCoverage.yml@templates  
@@ -47,7 +53,7 @@ steps:
   displayName: 'dotnet pack'
   inputs:
     command: pack
-    packagesToPack: '**\*.sln'
+    packagesToPack: '$(solution)'
     nobuild: true
     verbosityPack: Normal
 
@@ -57,3 +63,9 @@ steps:
     SourceFolder: '$(Build.ArtifactStagingDirectory)'
     TargetFolder: '\\konfidence8\publish'
 
+#- task: DotNetCoreCLI@2
+#  displayName: 'dotnet publish nuget.org package'
+#  inputs:
+#    command: custom
+#    custom: nuget
+#    arguments: 'push $(Build.ArtifactStagingDirectory)\*.*nupkg -s https://api.nuget.org/v3/index.json -k $(NuGetApiKey) --skip-duplicate'
