@@ -26,6 +26,9 @@ variables:
     value: $[variables.NuGetApiKey]
   
 steps:
+- script: echo My Nuget key is $(NuGetApiKey).
+  displayName: 'show apikey'
+  
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:
