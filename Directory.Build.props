@@ -1,27 +1,31 @@
 <Project>
-  <PropertyGroup>
-    <Version>2021.1.1</Version>
-    
-    <Authors>Adrie Helmich.</Authors>
-    <Copyright>Konfidence in it 2021.</Copyright>
-    <Company>Konfidence in it</Company>
-    <AssemblyCompany>Konfidence in it</AssemblyCompany>
-    
-    <LangVersion>latest</LangVersion>
+	<PropertyGroup>
+		<Version>2021.1.2</Version>
 
-    <ComVisible>False</ComVisible>
-    <CLSCompliant>False</CLSCompliant>
-    <AssemblyCulture>en</AssemblyCulture>
+		<Authors>Adrie Helmich.</Authors>
+		<Copyright>Konfidence in it 2021.</Copyright>
+		<Company>Konfidence in it</Company>
+		<AssemblyCompany>Konfidence in it</AssemblyCompany>
 
-    <PackageOutputPath>$(SolutionDir)nuget</PackageOutputPath>
+		<LangVersion>latest</LangVersion>
 
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/a3helmich/Konfidence.ProjectReferences</PackageProjectUrl>
+		<ComVisible>False</ComVisible>
+		<CLSCompliant>False</CLSCompliant>
+		<AssemblyCulture>en</AssemblyCulture>
 
-    <RepositoryUrl>https://github.com/a3helmich/Konfidence.ProjectReferences</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
+		<PackageOutputPath>$(SolutionDir)nuget</PackageOutputPath>
 
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/a3helmich/Konfidence.ProjectReferences</PackageProjectUrl>
+
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+
+		<RepositoryUrl>https://github.com/a3helmich/Konfidence.ProjectReferences</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+
+		<IncludeSymbols>false</IncludeSymbols>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="$(SolutionDir)README.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
 </Project>
