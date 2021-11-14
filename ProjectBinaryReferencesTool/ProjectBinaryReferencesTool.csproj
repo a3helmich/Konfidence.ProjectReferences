@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net5.0;netcoreapp3.1;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
 
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackAsTool>true</PackAsTool>
 
     <Product>Project Binary Reference Checker</Product>
