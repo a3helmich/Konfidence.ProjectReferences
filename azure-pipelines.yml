@@ -18,7 +18,10 @@ resources:
       name: Konfidence/yaml.Templates
       ref: refs/heads/main
 
+ 
 variables:
+  - name: disable.coverage.autogenerate
+    value: 'true'
   - name: solution
     value: '**/*.sln'
   - group: nuget.org-apikeys
