@@ -16,8 +16,7 @@ resources:
     - repository: templates
       type: git
       name: Konfidence/yaml.Templates
-      ref: refs/heads/main
-
+      ref: refs/heads/develop
  
 variables:
   - name: disable.coverage.autogenerate
@@ -29,6 +28,7 @@ variables:
     value: $[variables.NuGetApiKey]
   
 steps:
+
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:
