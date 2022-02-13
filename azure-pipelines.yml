@@ -63,12 +63,6 @@ steps:
     nobuild: true
     verbosityPack: Normal
 
-- task: CopyFiles@2
-  displayName: 'Copy Files to: \\konfidence8\publish'
-  inputs:
-    SourceFolder: '$(Build.ArtifactStagingDirectory)'
-    TargetFolder: '\\konfidence8\publish'
-
 - task: DotNetCoreCLI@2
   displayName: 'dotnet publish nuget.org package'
   inputs:
