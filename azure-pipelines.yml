@@ -23,6 +23,8 @@ variables:
     value: 'true'
   - name: solution
     value: '**/*.sln'
+  - name: buildConfiguration
+    value: 'Release'
   - group: nuget.org-apikeys
   - name: vNuGetApiKey
     value: $[variables.NuGetApiKey]
