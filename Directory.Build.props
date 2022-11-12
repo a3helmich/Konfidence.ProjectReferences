@@ -7,6 +7,7 @@
 		<Company>Konfidence in it</Company>
 		<AssemblyCompany>Konfidence in it</AssemblyCompany>
 
+		<TargetFrameworks>net7.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 
 		<ComVisible>False</ComVisible>

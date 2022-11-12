@@ -20,7 +20,7 @@ resources:
  
 variables:
   - name: disable.coverage.autogenerate
-    value: 'true'
+    value: 'false'
   - name: solution
     value: '**/*.sln'
   - name: buildConfiguration
@@ -30,6 +30,8 @@ variables:
     value: $[variables.NuGetApiKey]
   
 steps:
+- checkout: self
+  clean: true
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
@@ -51,7 +53,7 @@ steps:
   inputs:
     command: test
     projects: '$(solution)'
-    arguments: '-c $(BuildConfiguration) --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+    arguments: '-c $(BuildConfiguration) --no-build --collect:"XPlat Code Coverage"
 
 - template: GenerateAndPublishCodeCoverage.yml@templates  
 
