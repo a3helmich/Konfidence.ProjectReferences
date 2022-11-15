@@ -53,7 +53,7 @@ steps:
   inputs:
     command: test
     projects: '$(solution)'
-    arguments: '-c $(BuildConfiguration) --no-build --collect:"XPlat Code Coverage"
+    arguments: '-c $(BuildConfiguration) --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
 
 - template: GenerateAndPublishCodeCoverage.yml@templates  
 
