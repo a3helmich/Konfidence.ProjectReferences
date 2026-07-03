@@ -10,7 +10,7 @@ namespace rd_deep
 {
     public class DeepFileDeleter
     {
-        private readonly List<Task> _deleteTasks = new();
+        private readonly List<Task> _deleteTasks = [];
 
         private readonly List<string> _args;
 
@@ -24,15 +24,15 @@ namespace rd_deep
 
             //var totalFiles = CopyFilePresenter.CopyFiles(@"C:\Projects\Producten\ProjectReferences\rd-deep\Test", @"C:\Projects\Producten\ProjectReferences\rd-deep\Test", "Test");
 
-            var start = DateTime.Now;
+            DateTime start = DateTime.Now;
 
-            DeleteAllFolders(_args.First(), out var totalFiles);
+            DeleteAllFolders(_args.First(), out int totalFiles);
 
-            Task.WaitAll(_deleteTasks.ToArray());
+            Task.WaitAll(_deleteTasks);
 
-            var end = DateTime.Now;
+            DateTime end = DateTime.Now;
 
-            var duration = end - start;
+            TimeSpan duration = end - start;
 
             Console.WriteLine($"it took {duration.TotalMilliseconds} ms to delete {totalFiles} files");
             Debug.WriteLine($"it took {duration.TotalMilliseconds} ms to delete {totalFiles} files");
@@ -40,19 +40,19 @@ namespace rd_deep
 
         private List<string> DeleteAllFolders([NotNull] string folderName, out int totalFiles)
         {
-            var folders = Directory.GetDirectories(folderName).ToList();
+            List<string> folders = [.. Directory.GetDirectories(folderName)];
 
             totalFiles = folders.Count;
 
-            foreach (var folder in folders)
+            foreach (string folder in folders)
             {
-                var subFolders = DeleteAllFolders(folder, out var totalSubFiles);
+                List<string> subFolders = DeleteAllFolders(folder, out int totalSubFiles);
 
                 totalFiles += totalSubFiles;
 
                 if (!subFolders.Any())
                 {
-                    var deleteTask = new Task(() =>
+                    Task deleteTask = new(() =>
                     {
                         Directory.Delete(folder, recursive: true);
                     });

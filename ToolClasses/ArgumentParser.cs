@@ -18,10 +18,10 @@ namespace ToolClasses
                 return (string.Empty, ".");
             }
 
-            var basePath = ".";
-            var solutionFile = string.Empty;
+            string basePath = ".";
+            string solutionFile = string.Empty;
 
-            if (args.TryParseArgument(Arguments.Solution, out var commandLineArgument))
+            if (args.TryParseArgument(Arguments.Solution, out string commandLineArgument))
             {
                 solutionFile = commandLineArgument;
             }

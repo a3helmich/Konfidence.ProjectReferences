@@ -17,7 +17,7 @@ namespace ToolClasses.Solutions
 
             Name = name;
 
-            if (!Guid.TryParse(projectTypeGuid, out var projectGuid))
+            if (!Guid.TryParse(projectTypeGuid, out Guid projectGuid))
             {
                 throw new FormatException($"{name}:{projectTypeGuid}");
             }

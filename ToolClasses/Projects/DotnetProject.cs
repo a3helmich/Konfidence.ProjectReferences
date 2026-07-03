@@ -20,17 +20,17 @@ namespace ToolClasses.Projects
 
         public string ProjectTypeId { get; set; }
 
-        public List<string> ProjectLines { get; set; } = new List<string>();
+        public List<string> ProjectLines { get; set; } = [];
 
-        public List<string> ProjectReferences { get; set; } = new List<string>();
+        public List<string> ProjectReferences { get; set; } = [];
 
-        public List<IDotNetProject> BinaryReferencedProjects { get; set; } = new List<IDotNetProject>();
+        public List<IDotNetProject> BinaryReferencedProjects { get; set; } = [];
 
-        public List<IDotNetProject> ReferencedProjects { get; set; } = new List<IDotNetProject>();
+        public List<IDotNetProject> ReferencedProjects { get; set; } = [];
 
-        public List<IDotNetProject> ReferencedSubProjects { get; set; } = new List<IDotNetProject>();
+        public List<IDotNetProject> ReferencedSubProjects { get; set; } = [];
 
-        public List<IDotNetProject> RedundantReferencedProjects { get; set; } = new List<IDotNetProject>();
+        public List<IDotNetProject> RedundantReferencedProjects { get; set; } = [];
 
         public DotNetProject([NotNull] string projectName)
         {

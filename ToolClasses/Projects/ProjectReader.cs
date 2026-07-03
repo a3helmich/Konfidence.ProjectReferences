@@ -33,7 +33,7 @@ namespace ToolClasses.Projects
         [NotNull]
         public ProjectReader Execute([NotNull] List<string> projectFileNames)
         {
-            var allProjects = projectFileNames
+            List<IDotNetProject> allProjects = projectFileNames
                 .Select(projectFileName => new DotNetProject(projectFileName).BuildDotnetProject())
                 .ToList();
 

@@ -23,9 +23,9 @@ namespace ToolClasses.Solutions
 
             SolutionFile = Path.GetFileName(solutionFile);
 
-            SolutionLines = new List<string>();
+            SolutionLines = [];
 
-            SolutionProjects = new List<ISolutionProject>();
+            SolutionProjects = [];
         }
     }
 }

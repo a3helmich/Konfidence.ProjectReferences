@@ -10,111 +10,114 @@ namespace ToolClasses.ExtensionMethods
     [UsedImplicitly]
     internal static class ProjectReaderExtensions
     {
-        [NotNull]
-        public static ProjectReader ExtendProjectsWithProjectReferences([NotNull] this ProjectReader projectReader)
+        extension([NotNull] ProjectReader projectReader)
         {
-            foreach (var project in projectReader.SdkProjects)
+            [NotNull]
+            public ProjectReader ExtendProjectsWithProjectReferences()
             {
-                foreach (var projectReference in project.ProjectReferences)
+                foreach (IDotNetProject project in projectReader.SdkProjects)
                 {
-                    if (projectReader.ProjectFileNameLookup.TryGetValue(projectReference, out var referencedProject))
+                    foreach (string projectReference in project.ProjectReferences)
                     {
-                        project.ReferencedProjects.Add(referencedProject);
+                        if (projectReader.ProjectFileNameLookup.TryGetValue(projectReference, out IDotNetProject referencedProject))
+                        {
+                            project.ReferencedProjects.Add(referencedProject);
+                        }
                     }
                 }
-            }
 
-            return projectReader;
-        }
-
-        [NotNull]
-        public static ProjectReader ExtendProjectsWithBinaryReferences([NotNull] this ProjectReader projectReader)
-        {
-            foreach (var project in projectReader.SdkProjects)
-            {
-                var binaryReferences = project.GetBinaryReferences();
-
-                foreach (var binaryReference in binaryReferences)
-                {
-                    var referencedProject = projectReader.SdkProjects.FirstOrDefault(x => x.AssemblyName == binaryReference);
-
-                    if (referencedProject.IsAssigned())
-                    {
-                        project.BinaryReferencedProjects.Add(referencedProject);
-                    }
-                }
-            }
-
-            return projectReader;
-        }
-
-        [NotNull]
-        public static ProjectReader ExtendProjectsWithAllSubProjectReferences([NotNull] this ProjectReader projectReader)
-        {
-            foreach (var sdkProject in projectReader.SdkProjects)
-            {
-                var subProjectReferences = sdkProject.GetSubProjectReferences();
-
-                sdkProject.ReferencedSubProjects.AddRange(subProjectReferences);
-            }
-
-            return projectReader;
-        }
-
-        [NotNull]
-        public static ProjectReader ExtendProjectsWithSolutionProjects([NotNull] this ProjectReader projectReader, List<ISolutionProject> solutionProjects)
-        {
-            if (!solutionProjects.IsAssigned() || !solutionProjects.Any())
-            {
                 return projectReader;
             }
 
-            foreach (var sdkProject in projectReader.SdkProjects)
+            [NotNull]
+            public ProjectReader ExtendProjectsWithBinaryReferences()
             {
-                var solutionProject = solutionProjects.FirstOrDefault(x => x.ProjectFileName == sdkProject.FileName);
-
-                if (!solutionProject.IsAssigned())
+                foreach (IDotNetProject project in projectReader.SdkProjects)
                 {
-                    continue;
+                    IEnumerable<string> binaryReferences = project.GetBinaryReferences();
+
+                    foreach (string binaryReference in binaryReferences)
+                    {
+                        IDotNetProject referencedProject = projectReader.SdkProjects.FirstOrDefault(x => x.AssemblyName == binaryReference);
+
+                        if (referencedProject.IsAssigned())
+                        {
+                            project.BinaryReferencedProjects.Add(referencedProject);
+                        }
+                    }
                 }
 
-                sdkProject.AssemblyName = sdkProject.AssemblyName.IsAssigned() ? sdkProject.AssemblyName : solutionProject.ProjectName;
-                sdkProject.ProjectName = solutionProject.ProjectName;
-                sdkProject.ProjectId = solutionProject.ProjectId;
-                sdkProject.ProjectTypeId = solutionProject.ProjectTypeId;
+                return projectReader;
             }
 
-            foreach (var frameworkProject in projectReader.FrameworkProjects)
+            [NotNull]
+            public ProjectReader ExtendProjectsWithAllSubProjectReferences()
             {
-                var solutionProject = solutionProjects.FirstOrDefault(x => x.ProjectFileName == frameworkProject.FileName);
-
-                if (!solutionProject.IsAssigned())
+                foreach (IDotNetProject sdkProject in projectReader.SdkProjects)
                 {
-                    continue;
+                    IEnumerable<IDotNetProject> subProjectReferences = sdkProject.GetSubProjectReferences();
+
+                    sdkProject.ReferencedSubProjects.AddRange(subProjectReferences);
                 }
 
-                frameworkProject.AssemblyName = frameworkProject.AssemblyName.IsAssigned() ? frameworkProject.AssemblyName : solutionProject.ProjectName;
-                frameworkProject.ProjectName = solutionProject.ProjectName;
-                frameworkProject.ProjectId = solutionProject.ProjectId;
-                frameworkProject.ProjectTypeId = solutionProject.ProjectTypeId;
+                return projectReader;
             }
 
-            return projectReader;
-        }
-
-        [NotNull]
-        public static ProjectReader ExtendProjectsWithAllRedundantProjectReferences([NotNull] this ProjectReader projectReader)
-        {
-            foreach (var sdkProject in projectReader.SdkProjects)
+            [NotNull]
+            public ProjectReader ExtendProjectsWithSolutionProjects(List<ISolutionProject> solutionProjects)
             {
-                var redundantReferencedSubProjects = sdkProject
-                    .ReferencedProjects
-                    .Where(referencedProject => sdkProject.ReferencedSubProjects.Any(referencedSubProject => referencedProject == referencedSubProject));
+                if (!solutionProjects.IsAssigned() || !solutionProjects.Any())
+                {
+                    return projectReader;
+                }
 
-                sdkProject.RedundantReferencedProjects.AddRange(redundantReferencedSubProjects);
+                foreach (IDotNetProject sdkProject in projectReader.SdkProjects)
+                {
+                    ISolutionProject solutionProject = solutionProjects.FirstOrDefault(x => x.ProjectFileName == sdkProject.FileName);
+
+                    if (!solutionProject.IsAssigned())
+                    {
+                        continue;
+                    }
+
+                    sdkProject.AssemblyName = sdkProject.AssemblyName.IsAssigned() ? sdkProject.AssemblyName : solutionProject.ProjectName;
+                    sdkProject.ProjectName = solutionProject.ProjectName;
+                    sdkProject.ProjectId = solutionProject.ProjectId;
+                    sdkProject.ProjectTypeId = solutionProject.ProjectTypeId;
+                }
+
+                foreach (IDotNetProject frameworkProject in projectReader.FrameworkProjects)
+                {
+                    ISolutionProject solutionProject = solutionProjects.FirstOrDefault(x => x.ProjectFileName == frameworkProject.FileName);
+
+                    if (!solutionProject.IsAssigned())
+                    {
+                        continue;
+                    }
+
+                    frameworkProject.AssemblyName = frameworkProject.AssemblyName.IsAssigned() ? frameworkProject.AssemblyName : solutionProject.ProjectName;
+                    frameworkProject.ProjectName = solutionProject.ProjectName;
+                    frameworkProject.ProjectId = solutionProject.ProjectId;
+                    frameworkProject.ProjectTypeId = solutionProject.ProjectTypeId;
+                }
+
+                return projectReader;
             }
 
-            return projectReader;
+            [NotNull]
+            public ProjectReader ExtendProjectsWithAllRedundantProjectReferences()
+            {
+                foreach (IDotNetProject sdkProject in projectReader.SdkProjects)
+                {
+                    IEnumerable<IDotNetProject> redundantReferencedSubProjects = sdkProject
+                        .ReferencedProjects
+                        .Where(referencedProject => sdkProject.ReferencedSubProjects.Any(referencedSubProject => referencedProject == referencedSubProject));
+
+                    sdkProject.RedundantReferencedProjects.AddRange(redundantReferencedSubProjects);
+                }
+
+                return projectReader;
+            }
         }
     }
 }

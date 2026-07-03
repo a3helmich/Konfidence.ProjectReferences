@@ -1,8 +1,5 @@
-﻿using System.IO;
-using System.Linq;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using ToolClasses;
-using ToolClasses.ExtensionMethods;
 
 namespace ProjectReferencesTool
 {
@@ -10,7 +7,7 @@ namespace ProjectReferencesTool
     {
         static void Main([NotNull] string[] args)
         {
-            var (solutionFile, basePath) = ArgumentParser.ParseArguments(args);
+            (string solutionFile, string basePath) = ArgumentParser.ParseArguments(args);
 
             ArgumentParser.ValidateArguments(args, basePath, solutionFile);
 

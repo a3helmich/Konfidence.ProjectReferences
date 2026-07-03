@@ -6,6 +6,7 @@ using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
 using ToolClasses.Solutions;
+using ToolInterfaces;
 
 namespace ToolClasses
 {
@@ -25,7 +26,7 @@ namespace ToolClasses
 
             _projectReader = new ProjectReader(basePath);
 
-            var projectNames = _solutionReader.IsAssigned()
+            List<string> projectNames = _solutionReader.IsAssigned()
                 ? _solutionReader.GetFullProjectNames()
                 : _projectReader.GetFullProjectNames();
 
@@ -50,9 +51,9 @@ namespace ToolClasses
                 "Projects referencing other projects as a binary file:".WriteLine();
             }
 
-            foreach (var sdkProject in _projectReader.SdkProjects)
+            foreach (IDotNetProject sdkProject in _projectReader.SdkProjects)
             {
-                foreach (var binaryReferencedProject in sdkProject.BinaryReferencedProjects)
+                foreach (IDotNetProject binaryReferencedProject in sdkProject.BinaryReferencedProjects)
                 {
                     $"\tproject = {sdkProject.FileName}".WriteLine();
                     $"\t\treference = {binaryReferencedProject.AssemblyName}.dll".WriteLine();

@@ -1,11 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using JetBrains.Annotations;
-using Konfidence.Base;
+﻿using JetBrains.Annotations;
 using ToolClasses;
-using ToolClasses.ExtensionMethods;
-using ToolInterfaces;
 
 namespace ProjectBinaryReferencesTool
 {
@@ -13,7 +7,7 @@ namespace ProjectBinaryReferencesTool
     {
         static void Main([NotNull] string[] args)
         {
-            var (solutionFile, basePath) = ArgumentParser.ParseArguments(args);
+            (string solutionFile, string basePath) = ArgumentParser.ParseArguments(args);
 
             ArgumentParser.ValidateArguments(args, basePath, solutionFile);
 
