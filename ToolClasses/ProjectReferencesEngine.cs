@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
 using ToolClasses.Solutions;
+using ToolInterfaces;
 
 namespace ToolClasses
 {
@@ -24,7 +26,7 @@ namespace ToolClasses
 
             _projectReader = new ProjectReader(basePath);
 
-            var projectNames = _solutionReader.IsAssigned()
+            List<string> projectNames = _solutionReader.IsAssigned()
                 ? _solutionReader.GetFullProjectNames()
                 : _projectReader.GetFullProjectNames();
 
@@ -34,12 +36,12 @@ namespace ToolClasses
                 .ExtendProjectsWithAllSubProjectReferences()
                 .ExtendProjectsWithAllRedundantProjectReferences();
 
-            var projectsWithRedundantReferences = _projectReader
+            List<IDotNetProject> projectsWithRedundantReferences = _projectReader
                 .SdkProjects
                 .Where(x => x.RedundantReferencedProjects.Any())
                 .ToList();
 
-            var tab = new string(' ', 4);
+            string tab = new(' ', 4);
 
             if (!projectsWithRedundantReferences.Any())
             {
@@ -48,7 +50,7 @@ namespace ToolClasses
                 return;
             }
 
-            using var sw = new StreamWriter(@".\redundant.txt");
+            using StreamWriter sw = new(@".\redundant.txt");
 
             if (solutionFile.IsAssigned())
             {
@@ -59,13 +61,13 @@ namespace ToolClasses
                 "Redundant project references:".WriteLine();
             }
 
-            foreach (var projectWithRedundantReferences in projectsWithRedundantReferences)
+            foreach (IDotNetProject projectWithRedundantReferences in projectsWithRedundantReferences)
             {
-                var line = $@"{projectWithRedundantReferences.FileName.TrimStartIgnoreCase(basePath)}".WriteLine();
+                string line = $@"{projectWithRedundantReferences.FileName.TrimStartIgnoreCase(basePath)}".WriteLine();
 
                 sw.WriteLine(line);
 
-                foreach (var redundantReferencedProject in projectWithRedundantReferences.RedundantReferencedProjects)
+                foreach (IDotNetProject redundantReferencedProject in projectWithRedundantReferences.RedundantReferencedProjects)
                 {
                     line = $@"{tab} - {redundantReferencedProject.FileName.TrimStartIgnoreCase(basePath)}".WriteLine();
 

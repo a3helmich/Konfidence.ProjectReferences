@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
-using Konfidence.Base;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace rd_deep.UnitTest
@@ -15,17 +15,20 @@ namespace rd_deep.UnitTest
         [ClassInitialize]
         public static void ClassInitialize([NotNull] TestContext testContext)
         {
-            var deployment = testContext.DeploymentDirectory.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries).TrimList();
+            if (testContext.DeploymentDirectory != null)
+            {
+                List<string> deployment = testContext.DeploymentDirectory.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
 
-            var deploymentParts = deployment.TakeWhile(y => y != "bin").ToList();
+                List<string> deploymentParts = deployment.TakeWhile(y => y != "bin").ToList();
 
-            _testProjectFolder = string.Join(Path.DirectorySeparatorChar, deploymentParts);
+                _testProjectFolder = string.Join(Path.DirectorySeparatorChar, deploymentParts);
+            }
         }
 
         [TestInitialize]
         public void TestInitialize()
         {
-            var totalFiles = CopyFilePresenter.CopyFiles(Path.Combine(_testProjectFolder, "Test"), Path.Combine(_testProjectFolder, "Test"), "Test");
+            CopyFilePresenter.CopyFiles(Path.Combine(_testProjectFolder, "Test"), Path.Combine(_testProjectFolder, "Test"), "Test");
         }
 
         [Ignore("does not work right now")]

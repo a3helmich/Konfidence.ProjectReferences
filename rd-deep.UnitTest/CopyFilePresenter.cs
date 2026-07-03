@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using Konfidence.Base;
@@ -9,24 +10,24 @@ namespace rd_deep.UnitTest
     {
         internal static int CopyFiles([NotNull] string sourceFolder, string sourceRoot, string targetFolder)
         {
-            var folders = Directory.GetDirectories(sourceFolder).ToList();
+            List<string> folders = Directory.GetDirectories(sourceFolder).ToList();
 
-            var totalFiles = 0;
+            int totalFiles = 0;
 
-            foreach (var folder in folders)
+            foreach (string folder in folders)
             {
-                var files = Directory.GetFiles(folder, "*", SearchOption.AllDirectories);
+                string[] files = Directory.GetFiles(folder, "*", SearchOption.AllDirectories);
 
                 totalFiles += files.Length;
 
-                foreach (var file in files)
+                foreach (string file in files)
                 {
 
-                    var sourceFile = file.TrimStart(sourceRoot).TrimStart(@"\");
+                    string sourceFile = file.TrimStart(sourceRoot).TrimStart(@"\");
 
-                    var targetFile = Path.Combine(targetFolder, sourceFile);
+                    string targetFile = Path.Combine(targetFolder, sourceFile);
 
-                    var targetSubFolder = Path.GetDirectoryName(targetFile);
+                    string targetSubFolder = Path.GetDirectoryName(targetFile);
 
                     if (targetSubFolder.IsAssigned() && !Directory.Exists(targetSubFolder))
                     {

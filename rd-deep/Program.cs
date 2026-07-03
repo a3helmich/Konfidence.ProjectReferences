@@ -38,7 +38,7 @@ namespace rd_deep
                 return;
             }
 
-            var deepDeleteFiles = new DeepFileDeleter(args.ToList());
+            DeepFileDeleter deepDeleteFiles = new([.. args[..]]);
 
             deepDeleteFiles.Execute();
         }
