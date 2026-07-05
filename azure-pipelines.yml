@@ -49,7 +49,7 @@ steps:
   displayName: 'dotnet build'
   inputs:
     projects: '$(solution)'
-    arguments: '-c $(BuildConfiguration) --no-restore'
+    arguments: '-c $(BuildConfiguration) --no-restore /p:Version=$(year).$(majorVersion).$(minorVersion)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
@@ -68,7 +68,7 @@ steps:
     packagesToPack: '$(solution)'
     nobuild: true
     verbosityPack: Normal
-    buildProperties: 'PackageVersion=$(year).$(majorVersion).$(minorVersion)'
+    buildProperties: 'Version=$(year).$(majorVersion).$(minorVersion)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet publish nuget.org package'
