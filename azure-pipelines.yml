@@ -19,6 +19,9 @@ resources:
       ref: refs/heads/develop
  
 variables:
+  - template: ComputeVersion.yml@templates
+    parameters:
+      majorVersion: 1
   - name: disable.coverage.autogenerate
     value: 'false'
   - name: solution
@@ -65,6 +68,7 @@ steps:
     packagesToPack: '$(solution)'
     nobuild: true
     verbosityPack: Normal
+    buildProperties: 'PackageVersion=$(year).$(majorVersion).$(minorVersion)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet publish nuget.org package'
