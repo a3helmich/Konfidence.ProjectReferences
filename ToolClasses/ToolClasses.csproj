@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Konfidence.BaseClasses" Version="2026.2.1" />
+    <PackageReference Include="Konfidence.BaseClasses" Version="2026.2.2" />
   </ItemGroup>
 
   <ItemGroup>
