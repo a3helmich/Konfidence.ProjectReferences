@@ -63,6 +63,7 @@ steps:
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack'
+  condition: eq(variables['Build.Reason'], 'PullRequest')
   inputs:
     command: pack
     packagesToPack: '$(solution)'
@@ -72,6 +73,7 @@ steps:
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet publish nuget.org package'
+  condition: eq(variables['Build.Reason'], 'PullRequest')
   inputs:
     command: custom
     custom: nuget
