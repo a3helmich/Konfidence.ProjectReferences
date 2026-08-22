@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using Konfidence.Base;
@@ -9,26 +8,35 @@ namespace ToolClasses;
 
 public class ApplicationConfiguration
 {
-    public string BasePath { get; private set; }
+    public string BasePath { get; }
 
-    public string SolutionFile { get; set; }
+    public string SolutionFile { get; }
 
-    public bool Verbose { get; private set; }
+    public bool AllProjects { get; }
 
-    /// <summary>
-    /// commandline arguments example: --BasePath "C:\Projects\DayTradingServices.FakeFork" --Verbose --solution "ProjectReferences"
-    /// Valueless switches such as --Verbose must be expanded with ExpandSwitchArguments before
-    /// they reach AddCommandLine, otherwise they swallow the argument that follows them.
-    /// </summary>
-    /// <param name="configuration"></param>
+    public bool Help { get; }
 
     public ApplicationConfiguration(IConfiguration configuration)
     {
-        BasePath = configuration.GetValue(nameof(Arguments.BasePath), ".");
+        BasePath = configuration.GetValue(nameof(Arguments.BasePath), Directory.GetCurrentDirectory());
 
-        Verbose = configuration.GetValue(nameof(Arguments.Verbose), false);
+        AllProjects = configuration.GetValue(nameof(Arguments.AllProjects), false);
+
+        Help = configuration.GetValue(nameof(Arguments.Help), false);
 
         SolutionFile = configuration.GetValue(nameof(Arguments.Solution), string.Empty);
+
+        if (Help)
+        {
+            return;
+        }
+
+        if (AllProjects)
+        {
+            SolutionFile = string.Empty;
+
+            return;
+        }
 
         if (SolutionFile.IsAssigned())
         {
@@ -47,7 +55,7 @@ public class ApplicationConfiguration
             SolutionFile = string.Empty;
         }
 
-        string[] files = Directory.GetFiles(BasePath, "*.sln", SearchOption.TopDirectoryOnly) ?? [];
+        string[] files = Directory.GetFiles(BasePath, "*.sln", SearchOption.TopDirectoryOnly);
 
         if (!files.Any())
         {
@@ -63,6 +71,6 @@ public class ApplicationConfiguration
             return;
         }
 
-        SolutionFile = files.First();
+        SolutionFile = Path.GetFileName(files.First());
     }
 }

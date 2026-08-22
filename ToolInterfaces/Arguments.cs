@@ -4,5 +4,6 @@ public enum Arguments
 {
     Solution = 0,
     BasePath = 1,
-    Verbose = 2
+    AllProjects = 2,
+    Help = 3
 }

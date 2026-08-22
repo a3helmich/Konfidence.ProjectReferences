@@ -14,6 +14,8 @@ public class ApplicationConfigurationTests
 
     private string _basePath = string.Empty;
 
+    private string _currentDirectory = string.Empty;
+
     [TestInitialize]
     public void TestInitialize()
     {
@@ -22,11 +24,15 @@ public class ApplicationConfigurationTests
         Directory.CreateDirectory(_basePath);
 
         File.WriteAllText(Path.Combine(_basePath, $"{SolutionName}.sln"), string.Empty);
+
+        _currentDirectory = Directory.GetCurrentDirectory();
     }
 
     [TestCleanup]
     public void TestCleanup()
     {
+        Directory.SetCurrentDirectory(_currentDirectory);
+
         if (Directory.Exists(_basePath))
         {
             Directory.Delete(_basePath, recursive: true);
@@ -34,36 +40,10 @@ public class ApplicationConfigurationTests
     }
 
     [TestMethod]
-    public void Constructor_WithSolutionArgumentBeforeVerboseSwitch_ResolvesSolutionFile()
+    public void Constructor_WithAllProjectsSwitchBeforeBasePathArgument_ResolvesBasePath()
     {
         // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName, "--Verbose");
-
-        // Act
-        string solutionFile = context.ApplicationConfiguration.SolutionFile;
-
-        // Assert
-        Assert.AreEqual($"{SolutionName}.sln", solutionFile);
-    }
-
-    [TestMethod]
-    public void Constructor_WithVerboseSwitchBeforeSolutionArgument_ResolvesSolutionFile()
-    {
-        // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath, "--Verbose", "--solution", SolutionName);
-
-        // Act
-        string solutionFile = context.ApplicationConfiguration.SolutionFile;
-
-        // Assert
-        Assert.AreEqual($"{SolutionName}.sln", solutionFile);
-    }
-
-    [TestMethod]
-    public void Constructor_WithVerboseSwitchBeforeBasePathArgument_ResolvesBasePath()
-    {
-        // Arrange
-        TestContext context = CreateContext("--Verbose", "--BasePath", _basePath);
+        TestContext context = CreateContext("--AllProjects", "--BasePath", _basePath);
 
         // Act
         string basePath = context.ApplicationConfiguration.BasePath;
@@ -73,61 +53,169 @@ public class ApplicationConfigurationTests
     }
 
     [TestMethod]
-    public void Constructor_WithVerboseSwitchBeforeSolutionArgument_SetsVerbose()
+    public void Constructor_WithAllProjectsSwitchBetweenValueArguments_ResolvesBasePath()
     {
         // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath, "--Verbose", "--solution", SolutionName);
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects", "--solution", SolutionName);
 
         // Act
-        bool verbose = context.ApplicationConfiguration.Verbose;
+        string basePath = context.ApplicationConfiguration.BasePath;
 
         // Assert
-        Assert.IsTrue(verbose);
+        Assert.AreEqual(_basePath, basePath);
     }
 
     [TestMethod]
-    public void Constructor_WithTrailingVerboseSwitch_SetsVerbose()
+    public void Constructor_WithAllProjectsSwitchBetweenValueArguments_SetsAllProjects()
     {
         // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName, "--Verbose");
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects", "--solution", SolutionName);
 
         // Act
-        bool verbose = context.ApplicationConfiguration.Verbose;
+        bool allProjects = context.ApplicationConfiguration.AllProjects;
 
         // Assert
-        Assert.IsTrue(verbose);
+        Assert.IsTrue(allProjects);
     }
 
     [TestMethod]
-    public void Constructor_WithoutVerboseSwitch_LeavesVerboseUnset()
+    public void Constructor_WithTrailingAllProjectsSwitch_SetsAllProjects()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName, "--AllProjects");
+
+        // Act
+        bool allProjects = context.ApplicationConfiguration.AllProjects;
+
+        // Assert
+        Assert.IsTrue(allProjects);
+    }
+
+    [TestMethod]
+    public void Constructor_WithoutAllProjectsSwitch_LeavesAllProjectsUnset()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
 
         // Act
-        bool verbose = context.ApplicationConfiguration.Verbose;
+        bool allProjects = context.ApplicationConfiguration.AllProjects;
 
         // Assert
-        Assert.IsFalse(verbose);
+        Assert.IsFalse(allProjects);
     }
 
     [TestMethod]
-    public void Constructor_WithExplicitlyDisabledVerboseFlag_LeavesVerboseUnset()
+    public void Constructor_WithExplicitlyDisabledAllProjectsFlag_LeavesAllProjectsUnset()
     {
         // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath, "--Verbose=false", "--solution", SolutionName);
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects=false", "--solution", SolutionName);
 
         // Act
-        bool verbose = context.ApplicationConfiguration.Verbose;
+        bool allProjects = context.ApplicationConfiguration.AllProjects;
 
         // Assert
-        Assert.IsFalse(verbose);
+        Assert.IsFalse(allProjects);
+    }
+
+    [TestMethod]
+    public void Constructor_WithAllProjectsSwitch_BypassesTheSolutionInTheBasePath()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual(string.Empty, solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithAllProjectsSwitch_BypassesAnExplicitlyNamedSolution()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects", "--solution", SolutionName);
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual(string.Empty, solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithoutAllProjectsSwitch_ResolvesTheSolutionInTheBasePath()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath);
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual($"{SolutionName}.sln", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithoutBasePathArgument_FallsBackToTheCurrentDirectory()
+    {
+        // Arrange
+        Directory.SetCurrentDirectory(_basePath);
+
+        string currentDirectory = Directory.GetCurrentDirectory();
+
+        TestContext context = CreateContext("--solution", SolutionName);
+
+        // Act
+        string basePath = context.ApplicationConfiguration.BasePath;
+
+        // Assert
+        Assert.AreEqual(currentDirectory, basePath);
+    }
+
+    [TestMethod]
+    public void Constructor_WithoutAllProjectsSwitch_ResolvesAnExplicitlyNamedSolution()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual($"{SolutionName}.sln", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithHelpSwitchBetweenValueArguments_SetsHelp()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--Help", "--solution", SolutionName);
+
+        // Act
+        bool help = context.ApplicationConfiguration.Help;
+
+        // Assert
+        Assert.IsTrue(help);
+    }
+
+    [TestMethod]
+    public void Constructor_WithoutHelpSwitch_LeavesHelpUnset()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath);
+
+        // Act
+        bool help = context.ApplicationConfiguration.Help;
+
+        // Assert
+        Assert.IsFalse(help);
     }
 
     private static TestContext CreateContext(params string[] args)
     {
         IConfiguration configuration = new ConfigurationBuilder()
-            .AddCommandLine(args.ExpandSwitchArguments(Arguments.Verbose))
+            .AddCommandLine(args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments))
             .Build();
 
         return new TestContext(new ApplicationConfiguration(configuration));

@@ -14,7 +14,7 @@ internal class Program
 
     private static void Main(string[] args)
     {
-        string[] commandLineArguments = args.ExpandSwitchArguments(Arguments.Verbose);
+        string[] commandLineArguments = args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments);
 
         // CreateDefaultBuilder already adds the command line as the last configuration source
         IHostBuilder hostBuilder = Host.CreateDefaultBuilder(commandLineArguments);

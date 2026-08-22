@@ -13,6 +13,10 @@ public class ProjectReferencesEngineTests
 {
     private const string RedundantFileName = "redundant.txt";
 
+    private const string SolutionName = "TestSolution";
+
+    private const string CSharpProjectTypeId = "{9A19103F-16F7-4668-BE54-9A1E7A4F7556}";
+
     private string _basePath = string.Empty;
 
     private string _outputPath = string.Empty;
@@ -48,7 +52,7 @@ public class ProjectReferencesEngineTests
     public void Execute_WithoutSolutionFile_ReportsRedundantReferencesFoundByScanningTheBasePath()
     {
         // Arrange
-        TestContext context = CreateContext();
+        TestContext context = CreateContext("--BasePath", _basePath);
 
         // Act
         context.ProjectReferencesEngine.Execute();
@@ -64,7 +68,7 @@ public class ProjectReferencesEngineTests
     public void Execute_WithoutSolutionFile_DoesNotReportProjectsThatAreOnlyReferencedOnce()
     {
         // Arrange
-        TestContext context = CreateContext();
+        TestContext context = CreateContext("--BasePath", _basePath);
 
         // Act
         context.ProjectReferencesEngine.Execute();
@@ -75,6 +79,39 @@ public class ProjectReferencesEngineTests
         Assert.IsFalse(redundant.Contains(Path.Combine("B", "B.csproj"), StringComparison.OrdinalIgnoreCase));
     }
 
+    [TestMethod]
+    public void Execute_WithSolutionThatOmitsAProject_DoesNotReportTheOmittedProject()
+    {
+        // Arrange
+        WriteSolution("A", "B");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
+
+        // Act
+        context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        AssertRedundantFileWasNotWritten();
+    }
+
+    [TestMethod]
+    public void Execute_WithAllProjectsSwitch_BypassesTheSolutionAndReportsProjectsOutsideIt()
+    {
+        // Arrange
+        WriteSolution("A", "B");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects", "--solution", SolutionName);
+
+        // Act
+        context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, Path.Combine("A", "A.csproj"));
+        StringAssert.Contains(redundant, Path.Combine("C", "C.csproj"));
+    }
+
     private string ReadRedundantFile()
     {
         string redundantFile = Path.Combine(_outputPath, RedundantFileName);
@@ -82,6 +119,13 @@ public class ProjectReferencesEngineTests
         Assert.IsTrue(File.Exists(redundantFile), $"expected the engine to report redundant references in '{redundantFile}'");
 
         return File.ReadAllText(redundantFile);
+    }
+
+    private void AssertRedundantFileWasNotWritten()
+    {
+        string redundantFile = Path.Combine(_outputPath, RedundantFileName);
+
+        Assert.IsFalse(File.Exists(redundantFile), $"expected no redundant references to be reported in '{redundantFile}'");
     }
 
     private static string CreateFolder(string name)
@@ -123,10 +167,23 @@ public class ProjectReferencesEngineTests
         File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
     }
 
-    private TestContext CreateContext()
+    private void WriteSolution(params string[] projectNames)
+    {
+        string solution = $"Microsoft Visual Studio Solution File, Format Version 12.00{Environment.NewLine}";
+
+        foreach (string projectName in projectNames)
+        {
+            solution += $@"Project(""{CSharpProjectTypeId}"") = ""{projectName}"", ""{projectName}\{projectName}.csproj"", ""{{{Guid.NewGuid()}}}""{Environment.NewLine}";
+            solution += $"EndProject{Environment.NewLine}";
+        }
+
+        File.WriteAllText(Path.Combine(_basePath, $"{SolutionName}.sln"), solution);
+    }
+
+    private TestContext CreateContext(params string[] args)
     {
         IConfiguration configuration = new ConfigurationBuilder()
-            .AddCommandLine(new[] { "--BasePath", _basePath }.ExpandSwitchArguments(Arguments.Verbose))
+            .AddCommandLine(args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments))
             .Build();
 
         ApplicationConfiguration applicationConfiguration = new(configuration);

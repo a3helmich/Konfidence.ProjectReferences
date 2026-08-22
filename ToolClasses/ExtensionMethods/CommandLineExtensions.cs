@@ -10,6 +10,11 @@ public static class CommandLineExtensions
 {
     private static readonly string[] SwitchPrefixes = ["--", "/"];
 
+    /// <summary>
+    /// every valueless switch the tool accepts, so the call sites cannot drift apart
+    /// </summary>
+    public static readonly Arguments[] SwitchArguments = [Arguments.AllProjects, Arguments.Help];
+
     extension(string[] args)
     {
         /// <summary>
