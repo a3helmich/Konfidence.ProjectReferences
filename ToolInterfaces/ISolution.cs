@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
 
-namespace ToolInterfaces
+namespace ToolInterfaces;
+
+public interface ISolution
 {
-    public interface ISolution
-    {
-        List<ISolutionProject> SolutionProjects { get; }
+    List<ISolutionProject> SolutionProjects { get; }
 
-        string SolutionFile { get; }
+    string SolutionFile { get; }
 
-        string SolutionPath { get; }
+    string SolutionPath { get; }
 
-        List<string> SolutionLines { get; set; }
+    List<string> SolutionLines { get; }
 
-        List<string> ProjectLines { get; set; }
-    }
+    List<string> ProjectLines { get; set; }
 }

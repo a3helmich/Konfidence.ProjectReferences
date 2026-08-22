@@ -2,7 +2,11 @@
   "profiles": {
     "ProjectReferencesTool": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Projects\\Producten\\ProjectReferences"
+      "commandLineArgs": "--BasePath \"C:\\Projects\\DayTradingServices.FakeFork\" --Verbose"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
     }
   }
 }

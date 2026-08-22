@@ -1,9 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>rd_deep</RootNamespace>
-
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-</Project>

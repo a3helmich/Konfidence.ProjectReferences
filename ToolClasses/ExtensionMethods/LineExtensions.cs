@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using JetBrains.Annotations;
 using Konfidence.Base;
 
-namespace ToolClasses.ExtensionMethods
+namespace ToolClasses.ExtensionMethods;
+
+public static class LineExtensions
 {
-    public static class LineExtensions
+    extension(string line)
     {
-        public static string WriteLine(this string line)
+        public string WriteLine()
         {
             Console.WriteLine(line);
             Debug.WriteLine($"=> {line}");
@@ -16,10 +16,11 @@ namespace ToolClasses.ExtensionMethods
             return line;
         }
 
-        [NotNull]
-        public static string TrimQuotes([NotNull] this string text)
+        public string TrimQuotes()
         {
-            return text.TrimStart("\"").TrimEnd("\"");
+            return line.StartsWith("\"")
+                ? line.TrimStart("\"").TrimEnd("\"")
+                : line;
         }
     }
 }
