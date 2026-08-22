@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+namespace ToolInterfaces;
 
-namespace ToolInterfaces
+public enum Arguments
 {
-    public enum Arguments
-    {
-        Solution = 0,
-        Path = 1
-    }
+    Solution = 0,
+    BasePath = 1,
+    Verbose = 2
 }

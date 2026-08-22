@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "ProjectBinaryReferencesTool": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Projects\\Producten\\ProjectReferences\\ProjectReferences.sln"
-    }
-  }
-}

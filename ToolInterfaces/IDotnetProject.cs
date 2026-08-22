@@ -1,33 +1,22 @@
 ﻿using System.Collections.Generic;
 
-namespace ToolInterfaces
+namespace ToolInterfaces;
+
+public interface IDotNetProject
 {
-    public interface IDotNetProject
-    {
-        string FileName { get; }
+    string FileName { get; }
 
-        bool SubProjectReferencesResolved { get; set; }
+    bool SubProjectReferencesResolved { get; set; }
 
-        string ProjectId { get; set; }
+    List<string> ProjectLines { get; }
 
-        string ProjectTypeId { get; set; }
+    bool IsSdkProject { get; set; }
 
-        string ProjectName { get; set; }
+    List<string> ProjectReferences { get; }
 
-        string AssemblyName { get; set; }
+    List<IDotNetProject> ReferencedProjects { get; }
 
-        List<string> ProjectLines { get; set; }
+    List<IDotNetProject> ReferencedSubProjects { get; }
 
-        bool IsSdkProject { get; set; }
-
-        List<string> ProjectReferences { get; set; }
-
-        List<IDotNetProject> BinaryReferencedProjects { get; set; }
-
-        List<IDotNetProject> ReferencedProjects { get; set; }
-
-        List<IDotNetProject> ReferencedSubProjects { get; set; } 
-
-        List<IDotNetProject> RedundantReferencedProjects { get; set; }
-    }
+    List<IDotNetProject> RedundantReferencedProjects { get; }
 }

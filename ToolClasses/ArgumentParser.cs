@@ -1,89 +1,49 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using JetBrains.Annotations;
+﻿using System.IO;
 using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolInterfaces;
 
-namespace ToolClasses
+namespace ToolClasses;
+
+public class ArgumentParser
 {
-    public class ArgumentParser
+    public bool ValidateArguments(ApplicationConfiguration applicationConfiguration)
     {
-
-        public static (string solutionFile, string basePath) ParseArguments([NotNull] params string[] args)
+        if (!applicationConfiguration.SolutionFile.IsAssigned()
+            && Directory.Exists(applicationConfiguration.BasePath))
         {
-            if (!args.Any())
-            {
-                return (string.Empty, ".");
-            }
-
-            string basePath = ".";
-            string solutionFile = string.Empty;
-
-            if (args.TryParseArgument(Arguments.Solution, out string commandLineArgument))
-            {
-                solutionFile = commandLineArgument;
-            }
-
-            if (!solutionFile.IsAssigned() && args.TryParseArgument(Arguments.Path, out commandLineArgument))
-            {
-                basePath = commandLineArgument;
-            }
-
-            if (!commandLineArgument.IsAssigned())
-            {
-                basePath = args[0];
-
-                if (!basePath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
-                {
-                    return (solutionFile, basePath);
-                }
-
-                solutionFile = Path.GetFileName(basePath);
-                basePath = Path.GetDirectoryName(basePath);
-            }
-
-            return (solutionFile, basePath);
+            return true;
         }
 
-        public static void ValidateArguments([NotNull] string[] args, [NotNull] string basePath, [NotNull] string solutionFile)
+        if (applicationConfiguration.SolutionFile.IsAssigned()
+            && Directory.Exists(applicationConfiguration.BasePath)
+            && File.Exists(Path.Combine(applicationConfiguration.BasePath, applicationConfiguration.SolutionFile)))
         {
-            if (solutionFile.IsAssigned() && File.Exists(Path.Combine(basePath, solutionFile)))
-            {
-                return;
-            }
-
-            if (!solutionFile.IsAssigned() && Directory.Exists(basePath))
-            {
-                return;
-            }
-
-            if (!args.Any())
-            {
-                return;
-            }
-
-            if (!Directory.Exists(basePath))
-            {
-                $"not found : path - '{basePath}'".WriteLine();
-            }
-
-            if (solutionFile.IsAssigned() && Directory.Exists(basePath) && !File.Exists(Path.Combine(basePath, solutionFile)))
-            {
-                $"not found : solution file - '{Path.Combine(basePath, solutionFile)}'".WriteLine();
-            }
-
-            new string('=', 78).WriteLine();
-
-            $"valid arguments : [PathOrSolutionName] [--{Arguments.Path}={Arguments.Path}] [--{Arguments.Solution}={Arguments.Solution}]".WriteLine();
-            "All arguments are mutually exclusive".WriteLine();
-
-            "PathOrSolutionName : lets see where we get with just a Path or a SolutionName.".WriteLine();
-            $"{Arguments.Path} : path where to look for .csproj files, recursively".WriteLine();
-            $"{Arguments.Solution} : the solutionfile [with path] to parse to get the .csproj files".WriteLine();
-
-            Environment.Exit(1);
+            return true;
         }
+
+        if (applicationConfiguration.BasePath.IsAssigned() && !Directory.Exists(applicationConfiguration.BasePath))
+        {
+            $"not found : path - '{applicationConfiguration.BasePath}'".WriteLine();
+
+            return false;
+        }
+
+        if (applicationConfiguration.SolutionFile.IsAssigned() && !File.Exists(Path.Combine(applicationConfiguration.BasePath, applicationConfiguration.SolutionFile)))
+        {
+            $"not found : solution file - '{Path.Combine(applicationConfiguration.BasePath, applicationConfiguration.SolutionFile)}'".WriteLine();
+
+            return false;
+        }
+
+        new string('=', 78).WriteLine();
+
+        $"valid arguments : [--{Arguments.BasePath}={Arguments.BasePath}] [--{Arguments.Solution}={Arguments.Solution}] [--{Arguments.Verbose}]".WriteLine();
+
+        $"{Arguments.BasePath} : path where to look for .csproj files, recursively".WriteLine();
+        $"{Arguments.Solution} : the solutionfile [with path] to parse to get the .csproj files".WriteLine();
+        $"{Arguments.Verbose} : switch, reports what the tool is doing".WriteLine();
+
+        return false;
     }
 }

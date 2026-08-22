@@ -7,151 +7,138 @@ using Konfidence.Base;
 using ToolClasses.Solutions;
 using ToolInterfaces;
 
-namespace ToolClasses.ExtensionMethods
+namespace ToolClasses.ExtensionMethods;
+
+[UsedImplicitly]
+internal static class SolutionExtensions
 {
-    [UsedImplicitly]
-    internal static class SolutionExtensions
+    extension(ISolution solution)
     {
-        extension([NotNull] ISolution solution)
+        public ISolution ReadSolutionLines()
         {
-            [NotNull]
-            public ISolution ReadSolutionLines()
+            using StreamReader sr = new(Path.Combine(solution.SolutionPath, solution.SolutionFile));
+
+            string? line;
+
+            while (!(line = sr.ReadLine()).IsEof())
             {
-                using StreamReader sr = new(Path.Combine(solution.SolutionPath, solution.SolutionFile));
-
-                string line;
-
-                while (!(line = sr.ReadLine()).IsEof())
-                {
-                    solution.SolutionLines.Add(line.Trim());
-                }
-
-                return solution;
+                solution.SolutionLines.Add(line.Trim());
             }
 
-            [NotNull]
-            public ISolution BuildSolution()
-            {
-
-                List<string> validProjectTypeIds =
-                [
-                    VSProjectTypes.ProjectTypesByName["C#"].ProjectTypeGuid,
-                    VSProjectTypes.ProjectTypesByName["C++"].ProjectTypeGuid,
-                    VSProjectTypes.ProjectTypesByName["ASP.NET Core"].ProjectTypeGuid
-                ];
-
-                solution.ProjectLines = solution
-                    .SolutionLines
-                    .Where(x => x.StartsWith("Project", StringComparison.OrdinalIgnoreCase))
-                    .Where(projectLine => validProjectTypeIds.Any(projectTypeId => projectLine.GetProjectTypeId() == projectTypeId))
-                    .ToList();
-
-                return solution;
-            }
+            return solution;
         }
 
-        [NotNull]
-        private static string GetProjectTypeId([NotNull] this string solutionProjectLine)
+        public ISolution BuildSolution()
         {
-            List<string> solutionProjectLineParts = solutionProjectLine.Split([","], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+            List<string> validProjectTypeIds =
+            [
+                VSProjectTypes.ProjectTypesByName["C#"].ProjectTypeGuid,
+                VSProjectTypes.ProjectTypesByName["C++"].ProjectTypeGuid,
+                VSProjectTypes.ProjectTypesByName["ASP.NET Core"].ProjectTypeGuid
+            ];
 
-            return solutionProjectLineParts.GetProjectTypeIdString();
+            solution.ProjectLines = solution
+                .SolutionLines
+                .Where(x => x.StartsWith("Project", StringComparison.OrdinalIgnoreCase))
+                .Where(projectLine => validProjectTypeIds.Any(projectTypeId => projectLine.GetProjectTypeId() == projectTypeId))
+                .ToList();
+
+            return solution;
+        }
+    }
+
+    private static string GetProjectTypeId(this string solutionProjectLine)
+    {
+        List<string> solutionProjectLineParts = solutionProjectLine.Split([","], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+
+        return solutionProjectLineParts.GetProjectTypeIdString();
+    }
+
+    extension(ISolution solution)
+    {
+        public ISolution BuildSolutionProjects()
+        {
+            List<SolutionProject> solutionProjects = solution.ProjectLines
+                .Select(x => x.BuildSolutionProject())
+                .ToList();
+
+            solution.SolutionProjects.AddRange(solutionProjects);
+
+            return solution;
         }
 
-        extension([NotNull] ISolution solution)
+        public ISolution BuildSolutionProjectsFullName()
         {
-            [NotNull]
-            public ISolution BuildSolutionProjects()
-            {
-                List<SolutionProject> solutionProjects = solution.ProjectLines
-                    .Select(x => x.BuildSolutionProject())
-                    .ToList();
+            string solutionDirectory = solution.SolutionPath;// Path.GetDirectoryName(solution.SolutionFile) ?? string.Empty;
 
-                solution.SolutionProjects.AddRange(solutionProjects);
+            string currentDirectory = Directory.GetCurrentDirectory();
 
-                return solution;
-            }
+            Directory.SetCurrentDirectory(solutionDirectory);
 
-            [NotNull]
-            public ISolution BuildSolutionProjectsFullName()
-            {
-                string solutionDirectory = solution.SolutionPath;// Path.GetDirectoryName(solution.SolutionFile) ?? string.Empty;
+            solution.SolutionProjects.ForEach(x => x.ProjectFileName = Path.GetFullPath(x.ProjectFileName));
 
-                string currentDirectory = Directory.GetCurrentDirectory();
+            Directory.SetCurrentDirectory(currentDirectory);
 
-                Directory.SetCurrentDirectory(solutionDirectory);
-
-                solution.SolutionProjects.ForEach(x => x.ProjectFileName = Path.GetFullPath(x.ProjectFileName));
-
-                Directory.SetCurrentDirectory(currentDirectory);
-
-                return solution;
-            }
-
-            [NotNull]
-            public ISolution BuildDotNetProjects()
-            {
-
-                return solution;
-            }
+            return solution;
         }
 
-        [NotNull]
-        public static SolutionProject BuildSolutionProject([NotNull] this string solutionProjectLine)
+        public ISolution BuildDotNetProjects()
         {
-            SolutionProject solutionProject = new();
 
-            List<string> solutionProjectLineParts = solutionProjectLine.Split([","], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+            return solution;
+        }
+    }
 
-            solutionProject.ProjectTypeId = solutionProjectLineParts.GetProjectTypeIdString();
-            solutionProject.ProjectId = solutionProjectLineParts.GetProjectIdString();
-            solutionProject.ProjectName = solutionProjectLineParts.GetProjectName();
-            solutionProject.ProjectFileName = solutionProjectLineParts.GetProjectFileName();
+    public static SolutionProject BuildSolutionProject(this string solutionProjectLine)
+    {
+        SolutionProject solutionProject = new();
 
-            return solutionProject;
+        List<string> solutionProjectLineParts = solutionProjectLine.Split([","], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+
+        solutionProject.ProjectTypeId = solutionProjectLineParts.GetProjectTypeIdString();
+        solutionProject.ProjectId = solutionProjectLineParts.GetProjectIdString();
+        solutionProject.ProjectName = solutionProjectLineParts.GetProjectName();
+        solutionProject.ProjectFileName = solutionProjectLineParts.GetProjectFileName();
+
+        return solutionProject;
+    }
+
+    extension(List<string> projectLineParts)
+    {
+        private string GetProjectTypeIdString()
+        {
+            List<string> lineParts = projectLineParts[0]
+                .Split(["="], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList();
+
+            string projectTypeId = lineParts[0].TrimStart("Project(").TrimEnd(")").TrimQuotes();
+
+            return projectTypeId.IsGuid() ? projectTypeId : string.Empty;
         }
 
-        extension([NotNull] List<string> projectLineParts)
+        private string GetProjectIdString()
         {
-            [NotNull]
-            private string GetProjectTypeIdString()
-            {
-                List<string> lineParts = projectLineParts[0]
-                    .Split(["="], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                    .ToList();
+            string projectId = projectLineParts.Last().TrimQuotes();
 
-                string projectTypeId = lineParts[0].TrimStart("Project(").TrimEnd(")").TrimQuotes();
+            return projectId.IsGuid() ? projectId : string.Empty;
+        }
 
-                return projectTypeId.IsGuid() ? projectTypeId : string.Empty;
-            }
+        private string GetProjectName()
+        {
+            List<string> lineParts = projectLineParts[0]
+                .Split(["="], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList();
 
-            [NotNull]
-            private string GetProjectIdString()
-            {
-                string projectId = projectLineParts.Last().TrimQuotes();
+            string projectName = lineParts.Last().TrimQuotes();
 
-                return projectId.IsGuid() ? projectId : string.Empty;
-            }
+            return projectName;
+        }
 
-            [NotNull]
-            private string GetProjectName()
-            {
-                List<string> lineParts = projectLineParts[0]
-                    .Split(["="], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                    .ToList();
+        private string GetProjectFileName()
+        {
+            string projectFileName = projectLineParts[1].TrimQuotes();
 
-                string projectName = lineParts.Last().TrimQuotes();
-
-                return projectName;
-            }
-
-            [NotNull]
-            private string GetProjectFileName()
-            {
-                string projectFileName = projectLineParts[1].TrimQuotes();
-
-                return projectFileName;
-            }
+            return projectFileName;
         }
     }
 }

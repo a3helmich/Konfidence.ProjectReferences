@@ -1,54 +1,44 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using ToolClasses.ExtensionMethods;
 using ToolInterfaces;
 
-namespace ToolClasses.Projects
+namespace ToolClasses.Projects;
+
+internal class ProjectReader
 {
-    internal class ProjectReader
+    private readonly string _basePath;
+
+    public List<IDotNetProject> SdkProjects { get; private set; } = [];
+
+    public Dictionary<string, IDotNetProject> ProjectFileNameLookup { get; private set; } = [];
+
+    public ProjectReader(string basePath)
     {
-        private readonly string _basePath;
+        _basePath = Path.GetFullPath(basePath);
+    }
 
-        public List<IDotNetProject> SdkProjects { get; private set; }
+    public List<string> GetFullProjectNames()
+    {
+        return Directory
+            .GetFiles(_basePath, @"*.csproj", SearchOption.AllDirectories)
+            .ToList();
+    }
 
-        public List<IDotNetProject> FrameworkProjects { get; private set; }
+    public ProjectReader Execute(List<string> projectFileNames)
+    {
+        List<IDotNetProject> allProjects = projectFileNames
+            .Select(projectFileName => new DotNetProject(projectFileName).BuildDotnetProject())
+            .ToList();
 
-        public Dictionary<string, IDotNetProject> ProjectFileNameLookup { get; private set; }
+        ProjectFileNameLookup = allProjects
+            .ToDictionary(project => project.FileName);
 
-        public ProjectReader([NotNull] string basePath)
-        {
-            _basePath = Path.GetFullPath(basePath);
-        }
+        SdkProjects = allProjects
+            .Where(x => x.IsSdkProject)
+            .ToList();
 
-        [NotNull]
-        public List<string> GetFullProjectNames()
-        {
-            return Directory
-                .GetFiles(_basePath, @"*.csproj", SearchOption.AllDirectories)
-                .ToList();
-        }
-
-        [NotNull]
-        public ProjectReader Execute([NotNull] List<string> projectFileNames)
-        {
-            List<IDotNetProject> allProjects = projectFileNames
-                .Select(projectFileName => new DotNetProject(projectFileName).BuildDotnetProject())
-                .ToList();
-
-            ProjectFileNameLookup = allProjects
-                .ToDictionary(project => project.FileName);
-
-            SdkProjects = allProjects
-                .Where(x => x.IsSdkProject)
-                .ToList();
-
-            FrameworkProjects = allProjects
-                .Where(x => !x.IsSdkProject)
-                .ToList();
-
-            return this;
-        }
+        return this;
     }
 }

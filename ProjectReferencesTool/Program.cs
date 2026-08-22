@@ -1,18 +1,42 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using ToolClasses;
+using ToolClasses.ExtensionMethods;
+using ToolClasses.Solutions;
+using ToolInterfaces;
 
-namespace ProjectReferencesTool
+namespace ProjectReferencesTool;
+
+internal class Program
 {
-    class Program
+    private static IServiceProvider? ServiceProvider { get; set; }
+
+    private static void Main(string[] args)
     {
-        static void Main([NotNull] string[] args)
+        string[] commandLineArguments = args.ExpandSwitchArguments(Arguments.Verbose);
+
+        // CreateDefaultBuilder already adds the command line as the last configuration source
+        IHostBuilder hostBuilder = Host.CreateDefaultBuilder(commandLineArguments);
+
+        hostBuilder.ConfigureServices((
+            context,
+            services) =>
         {
-            (string solutionFile, string basePath) = ArgumentParser.ParseArguments(args);
+            ApplicationConfiguration applicationConfiguration = new(context.Configuration);
 
-            ArgumentParser.ValidateArguments(args, basePath, solutionFile);
+            services
+                .AddSingleton(applicationConfiguration)
+                .AddSingleton<ProjectReferencesEngine>()
+                .AddSingleton<SolutionReader>()
+                .AddSingleton<ISolution, Solution>()
+                .AddSingleton<ArgumentParser>();
+        });
 
-            new ProjectReferencesEngine()
-                .Execute(solutionFile, basePath);
-        }
+        ServiceProvider = hostBuilder.Build().Services;
+
+        ProjectReferencesEngine? projectReferencesEngine = ServiceProvider.GetService<ProjectReferencesEngine>();
+
+        projectReferencesEngine?.Execute();
     }
 }
