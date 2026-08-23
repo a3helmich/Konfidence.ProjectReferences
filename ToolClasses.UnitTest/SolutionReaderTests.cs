@@ -53,8 +53,6 @@ public class SolutionReaderTests
     public void Constructor_WithAMissingSolutionFile_DoesNotThrow()
     {
         // Arrange
-        // the argument parser reports a missing solution, but it only runs once the container is built,
-        // so reading from the constructor must survive a solution file that is not there
         WriteSolution("A");
 
         // Act

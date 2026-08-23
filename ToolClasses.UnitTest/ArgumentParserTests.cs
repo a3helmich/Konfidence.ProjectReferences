@@ -31,10 +31,38 @@ public class ArgumentParserTests
     }
 
     [TestMethod]
-    public void ValidateArguments_WithAnExistingBasePathAndNoSolution_ReturnsTrue()
+    public void ValidateArguments_WithASolutionNamedAfterTheBasePath_ReturnsTrue()
+    {
+        // Arrange
+        WriteFolderNamedSolution();
+
+        TestContext context = CreateContext("--BasePath", _basePath);
+
+        // Act
+        bool valid = ArgumentParser.ValidateArguments(context.ApplicationConfiguration);
+
+        // Assert
+        Assert.IsTrue(valid);
+    }
+
+    [TestMethod]
+    public void ValidateArguments_WithoutASolutionNamedAfterTheBasePath_ReturnsFalse()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath);
+
+        // Act
+        bool valid = ArgumentParser.ValidateArguments(context.ApplicationConfiguration);
+
+        // Assert
+        Assert.IsFalse(valid);
+    }
+
+    [TestMethod]
+    public void ValidateArguments_WithAllProjectsSwitchAndNoSolutionAnywhere_ReturnsTrue()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
 
         // Act
         bool valid = ArgumentParser.ValidateArguments(context.ApplicationConfiguration);
@@ -62,7 +90,6 @@ public class ArgumentParserTests
     public void ValidateArguments_WithAnExistingBasePathAndAMissingSolution_ReturnsFalse()
     {
         // Arrange
-        // a name carrying the '.sln' extension reaches the parser unresolved, so it is the parser that rejects it
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", "Missing.sln");
 
         // Act
@@ -89,7 +116,6 @@ public class ArgumentParserTests
     public void ValidateArguments_WithAMissingBasePath_ReturnsFalse()
     {
         // Arrange
-        // AllProjects returns before the solution scan, which is what keeps a missing base path constructable
         TestContext context = CreateContext("--BasePath", Path.Combine(_basePath, "Missing"), "--AllProjects");
 
         // Act
@@ -128,6 +154,11 @@ public class ArgumentParserTests
     private void WriteSolution()
     {
         File.WriteAllText(Path.Combine(_basePath, $"{SolutionName}.sln"), string.Empty);
+    }
+
+    private void WriteFolderNamedSolution()
+    {
+        File.WriteAllText(Path.Combine(_basePath, $"{Path.GetFileName(_basePath)}.sln"), string.Empty);
     }
 
     private static TestContext CreateContext(params string[] args)

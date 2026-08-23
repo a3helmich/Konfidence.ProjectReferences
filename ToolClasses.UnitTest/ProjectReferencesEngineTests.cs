@@ -29,7 +29,6 @@ public class ProjectReferencesEngineTests
         _basePath = CreateFolder("base");
         _outputPath = CreateFolder("output");
 
-        // project A references B and C directly, while B already references C: A -> C is redundant
         WriteProject("C");
         WriteProject("B", "C");
         WriteProject("A", "B", "C");
@@ -49,10 +48,10 @@ public class ProjectReferencesEngineTests
     }
 
     [TestMethod]
-    public void Execute_WithoutSolutionFile_ReportsRedundantReferencesFoundByScanningTheBasePath()
+    public void Execute_WithAllProjectsSwitch_ReportsRedundantReferencesFoundByScanningTheBasePath()
     {
         // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath);
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
 
         // Act
         context.ProjectReferencesEngine.Execute();
@@ -65,10 +64,10 @@ public class ProjectReferencesEngineTests
     }
 
     [TestMethod]
-    public void Execute_WithoutSolutionFile_DoesNotReportProjectsThatAreOnlyReferencedOnce()
+    public void Execute_WithAllProjectsSwitch_DoesNotReportProjectsThatAreOnlyReferencedOnce()
     {
         // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath);
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
 
         // Act
         context.ProjectReferencesEngine.Execute();

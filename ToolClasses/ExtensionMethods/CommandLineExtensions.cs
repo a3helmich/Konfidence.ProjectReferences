@@ -10,19 +10,10 @@ public static class CommandLineExtensions
 {
     private static readonly string[] SwitchPrefixes = ["--", "/"];
 
-    /// <summary>
-    /// every valueless switch the tool accepts, so the call sites cannot drift apart
-    /// </summary>
     public static readonly Arguments[] SwitchArguments = [Arguments.AllProjects, Arguments.Help];
 
     extension(string[] args)
     {
-        /// <summary>
-        /// AddCommandLine has no notion of a valueless switch: for '--Verbose' it takes the
-        /// argument that follows as its value, swallowing that argument. Rewriting '--Verbose'
-        /// to '--Verbose=true' hands the configuration provider the key/value pair it expects,
-        /// so switches and flags can be mixed in any order.
-        /// </summary>
         public string[] ExpandSwitchArguments(params Arguments[] switchArguments)
         {
             List<string> switchNames = [.. switchArguments.Select(switchArgument => switchArgument.ToString())];

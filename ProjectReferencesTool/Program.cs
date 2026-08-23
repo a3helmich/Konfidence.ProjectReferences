@@ -17,7 +17,6 @@ internal class Program
     {
         string[] commandLineArguments = args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments);
 
-        // CreateDefaultBuilder already adds the command line as the last configuration source
         IHostBuilder hostBuilder = Host.CreateDefaultBuilder(commandLineArguments);
 
         hostBuilder.ConfigureServices((

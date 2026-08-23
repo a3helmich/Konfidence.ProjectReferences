@@ -41,10 +41,10 @@ public class ProjectNamesTests
     }
 
     [TestMethod]
-    public void GetFullProjectNames_WithoutSolutionFile_ReturnsEveryProjectBelowTheBasePath()
+    public void GetFullProjectNames_WithAllProjectsSwitch_ReturnsEveryProjectBelowTheBasePath()
     {
         // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath);
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
 
         // Act
         List<string> projectNames = context.ProjectNames.GetFullProjectNames();
@@ -87,7 +87,6 @@ public class ProjectNamesTests
     public void GetFullProjectNames_WithASolutionWithoutProjects_DoesNotFallBackToScanningTheBasePath()
     {
         // Arrange
-        // a named solution keeps the scan solution scoped, even when that solution turns out to hold nothing
         WriteSolution();
 
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
@@ -115,10 +114,10 @@ public class ProjectNamesTests
     }
 
     [TestMethod]
-    public void GetFullProjectNames_WithoutSolutionFile_ReturnsRootedPaths()
+    public void GetFullProjectNames_WithAllProjectsSwitch_ReturnsRootedPaths()
     {
         // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath);
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
 
         // Act
         List<string> projectNames = context.ProjectNames.GetFullProjectNames();
@@ -181,7 +180,6 @@ public class ProjectNamesTests
 
         ApplicationConfiguration applicationConfiguration = new(configuration);
 
-        // the solution reader reads the solution from its constructor, so the fixture must exist by now
         SolutionReader solutionReader = new(new Solution(applicationConfiguration), applicationConfiguration);
 
         ProjectReader projectReader = new(applicationConfiguration);

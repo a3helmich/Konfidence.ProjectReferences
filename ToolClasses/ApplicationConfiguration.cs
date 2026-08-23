@@ -1,5 +1,4 @@
 using System.IO;
-using System.Linq;
 using Konfidence.Base;
 using Microsoft.Extensions.Configuration;
 using ToolInterfaces;
@@ -19,7 +18,7 @@ public class ApplicationConfiguration
     public ApplicationConfiguration(
         IConfiguration configuration)
     {
-        BasePath = configuration.GetValue(nameof(Arguments.BasePath), Directory.GetCurrentDirectory());
+        BasePath = Path.TrimEndingDirectorySeparator(configuration.GetValue(nameof(Arguments.BasePath), Directory.GetCurrentDirectory()));
 
         AllProjects = configuration.GetValue(nameof(Arguments.AllProjects), false);
 
@@ -39,9 +38,6 @@ public class ApplicationConfiguration
             return;
         }
 
-        // a named solution is taken as given, extension or not: whether it exists is the argument
-        // parser's call, so it can report a solution file it cannot find rather than quietly
-        // falling back to whatever solution happens to sit in the base path
         if (SolutionFile.IsAssigned())
         {
             SolutionFile = SolutionFile.EndsWith(".sln") ? SolutionFile : $"{SolutionFile}.sln";
@@ -49,23 +45,12 @@ public class ApplicationConfiguration
             return;
         }
 
-        string[] files = Directory.GetFiles(BasePath, "*.sln", SearchOption.TopDirectoryOnly);
+        string topPath = Path.GetFileName(BasePath);
 
-        if (!files.Any())
-        {
-            return;
-        }
-
-        string topPath = Path.GetFileNameWithoutExtension(BasePath);
-
-        if (topPath.IsAssigned() && files.Contains(Path.Combine(BasePath, $"{topPath}.sln")))
+        if (topPath.IsAssigned())
         {
             SolutionFile = $"{topPath}.sln";
-
-            return;
         }
-
-        SolutionFile = Path.GetFileName(files.First());
     }
 
     public bool ValidConfiguration()
