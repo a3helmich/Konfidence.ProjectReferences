@@ -36,6 +36,8 @@ steps:
 - checkout: self
   clean: true
 
+- template: VerifyVersionMatchesProps.yml@templates
+
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:

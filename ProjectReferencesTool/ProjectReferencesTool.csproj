@@ -1,24 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<IsPackable>true</IsPackable>
 
-    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
-    <PackAsTool>true</PackAsTool>
+		<GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+		<PackAsTool>true</PackAsTool>
 
-    <Product>Project Reference Checker</Product>
-    <PackageId>Konfidence.Project-References</PackageId>
-    <AssemblyName>Project-References</AssemblyName>
+		<Product>Project Reference Checker</Product>
+		<PackageId>Konfidence.Project-References</PackageId>
+		<AssemblyName>Project-References</AssemblyName>
 
-    <Title>Project-References</Title>
-    <Description>Tool for resolving redundant project references.</Description>
+		<Title>Project-References</Title>
+		<Description>Tool for resolving redundant project references.</Description>
 
-    <PackageTags>project reference redundant</PackageTags>
+		<PackageTags>project reference redundant</PackageTags>
 
-  </PropertyGroup>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ToolClasses\ToolClasses.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ToolClasses\ToolClasses.csproj" />
+	</ItemGroup>
 
 </Project>
