@@ -117,19 +117,6 @@ public class ApplicationConfigurationTests
     }
 
     [TestMethod]
-    public void Constructor_WithAllProjectsSwitch_BypassesTheSolutionInTheBasePath()
-    {
-        // Arrange
-        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
-
-        // Act
-        string solutionFile = context.ApplicationConfiguration.SolutionFile;
-
-        // Assert
-        Assert.AreEqual(string.Empty, solutionFile);
-    }
-
-    [TestMethod]
     public void Constructor_WithAllProjectsSwitch_BypassesAnExplicitlyNamedSolution()
     {
         // Arrange
@@ -143,7 +130,7 @@ public class ApplicationConfigurationTests
     }
 
     [TestMethod]
-    public void Constructor_WithoutAllProjectsSwitch_ResolvesTheSolutionInTheBasePath()
+    public void Constructor_WithoutSolutionArgument_DerivesTheSolutionNameFromTheFolderName()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath);
@@ -152,7 +139,33 @@ public class ApplicationConfigurationTests
         string solutionFile = context.ApplicationConfiguration.SolutionFile;
 
         // Assert
-        Assert.AreEqual($"{SolutionName}.sln", solutionFile);
+        Assert.AreEqual($"{Path.GetFileName(_basePath)}.sln", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithATrailingSeparatorOnTheBasePath_DerivesTheSameSolutionName()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", $"{_basePath}{Path.DirectorySeparatorChar}");
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual($"{Path.GetFileName(_basePath)}.sln", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithATrailingSeparatorOnTheBasePath_TrimsItFromTheBasePath()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", $"{_basePath}{Path.DirectorySeparatorChar}");
+
+        // Act
+        string basePath = context.ApplicationConfiguration.BasePath;
+
+        // Assert
+        Assert.AreEqual(_basePath, basePath);
     }
 
     [TestMethod]
@@ -215,7 +228,6 @@ public class ApplicationConfigurationTests
     public void Constructor_WithAMissingSolutionWithoutExtension_KeepsItSoTheParserCanReportIt()
     {
         // Arrange
-        // naming a solution never falls back to the one in the base path, whichever form the name takes
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", "Missing");
 
         // Act

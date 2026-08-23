@@ -15,8 +15,6 @@ public class SolutionReader
     {
         _solution = solution;
 
-        // the container builds this before the argument parser gets to run, so a solution file that is
-        // not there is left for the parser to report rather than thrown from a constructor
         if (SolutionFileExists(applicationConfiguration))
         {
             Execute();

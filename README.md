@@ -9,8 +9,8 @@ The project references tool is a console application which scans your .cs projec
 ### Using the tool
 - package: The project references tool is published as a package on [nuget.org - Konfidence.Project-References](https://www.nuget.org/packages/Konfidence.Project-References).
 - install: run 'dotnet tool install --global Konfidence.Project-References'
-- basic run: in a console go to your project folder and run 'project-references'.
-- result 1: console displays redundant project references within the found projects in your (sub-)folders.
+- basic run: in a console go to your solution folder and run 'project-references'. It scans the solution named after that folder, use '--AllProjects' to scan every project below it instead.
+- result 1: console displays redundant project references within the scanned projects.
 - result 2: creates a 'redundant.txt' file, which contains the results displayed in the console.
 - actions: manually update the references in your projects and remove the redundant project references
 - where: because it is a dotnetcore console application, it runs on both windows and linux.
@@ -44,19 +44,19 @@ The project references tool is a console application which scans your .cs projec
 	![](./readme/redundant-txt.PNG)
 
 ### How to run
-- project-references : scans the .sln file found in your current folder, or, when there is none, all csproj projects in your current folder and all it's subfolders.
-- project-references --AllProjects : scans all csproj projects in your current folder and all it's subfolders, ignoring any .sln file.
-- project-references --BasePath=c:\projects\myproject : scans the 'c:\projects\myproject' folder the same way.
+- project-references : scans the solution named after your current folder, so 'c:\projects\myapp' uses 'myapp.sln'.
+- project-references --AllProjects : scans all csproj projects in your current folder and all it's subfolders, ignoring any solution.
+- project-references --BasePath=c:\projects\myproject : uses 'c:\projects\myproject\myproject.sln'.
 - project-references --Solution=mysolution : scans only the csproj projects listed in 'mysolution.sln' in your current folder.
 - project-references --BasePath=c:\projects\myproject --Solution=mysolution : scans only the csproj projects listed in 'c:\projects\myproject\mysolution.sln'.
-- project-references --Solution=nosuchsolution : reports 'not found : solution file' and stops, whether or not another .sln is present.
-- project-references --BasePath=c:\projects\myproject --AllProjects : scans every csproj project below 'c:\projects\myproject', even when a .sln file is present.
+- project-references --Solution=nosuchsolution : reports 'not found : solution file' and stops.
+- project-references --Solution=mysolution --AllProjects : ignores the named solution and scans every csproj project below the base path.
 - project-references --Help : shows the available arguments and exits, without scanning anything.
 
 ### Arguments
-- --BasePath= folder to scan for csproj files, including it's subfolders. Defaults to the folder you run the tool from. [--BasePath=mypath]
-- --Solution= name of the solution file, only the csproj files in the solution file are scanned. The '.sln' extension is optional. When the named solution cannot be found the tool reports it and stops, it never falls back to another solution in the base path. [--Solution=mysolution]/[--Solution=mysolution.sln]
-- --AllProjects switch, scans every csproj file below the base path and ignores any solution file, including one named with --Solution. Use it to find projects which are not part of your solution. [--AllProjects]
+- --BasePath= folder to work from, and to scan for csproj files including it's subfolders. Defaults to the folder you run the tool from. A trailing separator is ignored. [--BasePath=mypath]
+- --Solution= name of the solution file, only the csproj files in the solution file are scanned. The '.sln' extension is optional. Without it the solution named after the base path folder is used, so a folder 'myapp' looks for 'myapp.sln'. When the solution cannot be found the tool reports it and stops. [--Solution=mysolution]/[--Solution=mysolution.sln]
+- --AllProjects switch, ignores the solution altogether and scans every csproj file below the base path. This is the only way to scan projects which are not part of a solution. [--AllProjects]
 - --Help switch, shows the available arguments and exits. Every other run prints a one line reminder that it exists. [--Help]
 
 Both '--argument=value' and '--argument value' are accepted.

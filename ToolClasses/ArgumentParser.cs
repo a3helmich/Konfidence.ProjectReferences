@@ -83,9 +83,10 @@ public static class ArgumentParser
 
         $"valid arguments : [--{Arguments.BasePath}={Arguments.BasePath}] [--{Arguments.Solution}={Arguments.Solution}] [--{Arguments.AllProjects}] [--{Arguments.Help}]".WriteLine();
 
-        $"{Arguments.BasePath} : path where to look for .csproj files, recursively, if no .sln file is specified the first .sln file found is parsed".WriteLine();
-        $"{Arguments.Solution} : the solutionfile [with path] to parse to get the .csproj files".WriteLine();
-        $"{Arguments.AllProjects} : switch, scans every .csproj below {Arguments.BasePath}, ignoring any solution file".WriteLine();
+        $"{Arguments.BasePath} : path to work from, defaults to the current folder".WriteLine();
+        $"{Arguments.Solution} : the solutionfile to parse to get the .csproj files, the '.sln' is optional.".WriteLine();
+        $"{new string(' ', Arguments.Solution.ToString().Length)}   without it the solution named after the {Arguments.BasePath} folder is used".WriteLine();
+        $"{Arguments.AllProjects} : switch, scans every .csproj below {Arguments.BasePath} instead, ignoring any solution".WriteLine();
         $"{Arguments.Help} : switch, shows this text and exits".WriteLine();
 
         new string('=', 78).WriteLine();
