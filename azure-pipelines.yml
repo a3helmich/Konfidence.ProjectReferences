@@ -21,7 +21,7 @@ resources:
 variables:
   - template: ComputeVersion.yml@templates
     parameters:
-      majorVersion: 1
+      majorVersion: 2
   - name: disable.coverage.autogenerate
     value: 'false'
   - name: solution
