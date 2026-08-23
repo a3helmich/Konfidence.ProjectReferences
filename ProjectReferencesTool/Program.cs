@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ToolClasses;
 using ToolClasses.ExtensionMethods;
+using ToolClasses.Projects;
 using ToolClasses.Solutions;
 using ToolInterfaces;
 
@@ -30,6 +31,8 @@ internal class Program
                 .AddSingleton<ProjectReferencesEngine>()
                 .AddSingleton<SolutionReader>()
                 .AddSingleton<ISolution, Solution>()
+                .AddSingleton<ProjectReader>()
+                .AddSingleton<ProjectNames>()
                 .AddSingleton<ArgumentParser>();
         });
 

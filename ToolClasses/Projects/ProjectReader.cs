@@ -6,7 +6,7 @@ using ToolInterfaces;
 
 namespace ToolClasses.Projects;
 
-internal class ProjectReader
+public class ProjectReader
 {
     private readonly string _basePath;
 
@@ -14,9 +14,9 @@ internal class ProjectReader
 
     public Dictionary<string, IDotNetProject> ProjectFileNameLookup { get; private set; } = [];
 
-    public ProjectReader(string basePath)
+    public ProjectReader(ApplicationConfiguration applicationConfiguration)
     {
-        _basePath = Path.GetFullPath(basePath);
+        _basePath = Path.GetFullPath(applicationConfiguration.BasePath);
     }
 
     public List<string> GetFullProjectNames()
