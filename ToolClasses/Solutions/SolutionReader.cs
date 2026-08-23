@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
@@ -14,10 +15,18 @@ public class SolutionReader
     {
         _solution = solution;
 
-        if (applicationConfiguration.SolutionFile.IsAssigned())
+        // the container builds this before the argument parser gets to run, so a solution file that is
+        // not there is left for the parser to report rather than thrown from a constructor
+        if (SolutionFileExists(applicationConfiguration))
         {
             Execute();
         }
+    }
+
+    private static bool SolutionFileExists(ApplicationConfiguration applicationConfiguration)
+    {
+        return applicationConfiguration.SolutionFile.IsAssigned()
+               && File.Exists(Path.Combine(applicationConfiguration.BasePath, applicationConfiguration.SolutionFile));
     }
 
     private void Execute()

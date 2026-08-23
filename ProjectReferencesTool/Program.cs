@@ -32,8 +32,7 @@ internal class Program
                 .AddSingleton<SolutionReader>()
                 .AddSingleton<ISolution, Solution>()
                 .AddSingleton<ProjectReader>()
-                .AddSingleton<ProjectNames>()
-                .AddSingleton<ArgumentParser>();
+                .AddSingleton<ProjectNames>();
         });
 
         ServiceProvider = hostBuilder.Build().Services;
