@@ -57,7 +57,7 @@ The project references tool is a console application which scans your .cs projec
 - --BasePath= folder to work from, and to scan for csproj files including it's subfolders. Defaults to the folder you run the tool from. A trailing separator is ignored. [--BasePath=mypath]
 - --Solution= name of the solution file, only the csproj files in the solution file are scanned. The '.sln' extension is optional. Without it the solution named after the base path folder is used, so a folder 'myapp' looks for 'myapp.sln'. When the solution cannot be found the tool reports it and stops. [--Solution=mysolution]/[--Solution=mysolution.sln]
 - --AllProjects switch, ignores the solution altogether and scans every csproj file below the base path. This is the only way to scan projects which are not part of a solution. [--AllProjects]
-- --Help switch, shows the available arguments and exits. Every other run prints a one line reminder that it exists. [--Help]
+- --Help switch, shows the available arguments and exits. A successful run prints a one line reminder that it exists, a run which reports a problem shows the arguments straight away. [--Help]
 
 Both '--argument=value' and '--argument value' are accepted.
 

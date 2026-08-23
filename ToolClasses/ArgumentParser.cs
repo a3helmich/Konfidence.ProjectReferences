@@ -16,14 +16,17 @@ public static class ArgumentParser
             return false;
         }
 
-        WriteHelpHint();
-
         if (HasValidArguments(applicationConfiguration))
         {
+            WriteHelpHint();
+
             return true;
         }
 
-        ReportInvalidArguments(applicationConfiguration);
+        if (ReportInvalidArguments(applicationConfiguration))
+        {
+            WriteUsage();
+        }
 
         return false;
     }
@@ -43,23 +46,23 @@ public static class ArgumentParser
         return true;
     }
 
-    private static void ReportInvalidArguments(ApplicationConfiguration applicationConfiguration)
+    private static bool ReportInvalidArguments(ApplicationConfiguration applicationConfiguration)
     {
         if (!Directory.Exists(applicationConfiguration.BasePath))
         {
             $"not found : path - '{applicationConfiguration.BasePath}'".WriteLine();
 
-            return;
+            return true;
         }
 
         if (applicationConfiguration.SolutionFile.IsAssigned())
         {
             $"not found : solution file - '{GetSolutionFileName(applicationConfiguration)}'".WriteLine();
 
-            return;
+            return true;
         }
 
-        WriteUsage();
+        return false;
     }
 
     private static bool SolutionFileExists(ApplicationConfiguration applicationConfiguration)
