@@ -188,15 +188,13 @@ public class ProjectReferencesEngineTests
 
         ApplicationConfiguration applicationConfiguration = new(configuration);
 
-        ArgumentParser argumentParser = new();
-
         ProjectReader projectReader = new(applicationConfiguration);
 
         SolutionReader solutionReader = new(new Solution(applicationConfiguration), applicationConfiguration);
 
         ProjectNames projectNames = new(solutionReader, projectReader, applicationConfiguration);
 
-        return new TestContext(new ProjectReferencesEngine(applicationConfiguration, argumentParser, projectReader, projectNames));
+        return new TestContext(new ProjectReferencesEngine(applicationConfiguration, projectReader, projectNames));
     }
 
     private sealed class TestContext

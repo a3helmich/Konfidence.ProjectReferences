@@ -5,9 +5,9 @@ using ToolInterfaces;
 
 namespace ToolClasses;
 
-public class ArgumentParser
+public static class ArgumentParser
 {
-    public bool ValidateArguments(ApplicationConfiguration applicationConfiguration)
+    public static bool ValidateArguments(ApplicationConfiguration applicationConfiguration)
     {
         if (applicationConfiguration.Help)
         {

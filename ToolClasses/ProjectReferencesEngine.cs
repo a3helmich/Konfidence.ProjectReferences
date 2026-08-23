@@ -11,7 +11,6 @@ namespace ToolClasses;
 public class ProjectReferencesEngine
 {
     private readonly ApplicationConfiguration _applicationConfiguration;
-    private readonly ArgumentParser _argumentParser;
 
     private readonly ProjectReader _projectReader;
 
@@ -19,19 +18,17 @@ public class ProjectReferencesEngine
 
     public ProjectReferencesEngine(
         ApplicationConfiguration applicationConfiguration,
-        ArgumentParser argumentParser,
         ProjectReader projectReader,
         ProjectNames projectNames)
     {
         _applicationConfiguration = applicationConfiguration;
-        _argumentParser = argumentParser;
         _projectReader = projectReader;
         _projectNames = projectNames;
     }
 
     public void Execute()
     {
-        if (!_argumentParser.ValidateArguments(_applicationConfiguration))
+        if (!_applicationConfiguration.ValidConfiguration())
         {
             return;
         }

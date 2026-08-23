@@ -3,7 +3,6 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
-using ToolInterfaces;
 
 namespace ToolClasses.UnitTest;
 
@@ -184,6 +183,46 @@ public class ApplicationConfigurationTests
 
         // Assert
         Assert.AreEqual($"{SolutionName}.sln", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithAnExplicitlyNamedSolutionEndingInSln_ResolvesThatSolution()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", $"{SolutionName}.sln");
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual($"{SolutionName}.sln", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithAMissingSolutionEndingInSln_KeepsItSoTheParserCanReportIt()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", "Missing.sln");
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual("Missing.sln", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithAMissingSolutionWithoutExtension_KeepsItSoTheParserCanReportIt()
+    {
+        // Arrange
+        // naming a solution never falls back to the one in the base path, whichever form the name takes
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", "Missing");
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual("Missing.sln", solutionFile);
     }
 
     [TestMethod]

@@ -16,7 +16,8 @@ public class ApplicationConfiguration
 
     public bool Help { get; }
 
-    public ApplicationConfiguration(IConfiguration configuration)
+    public ApplicationConfiguration(
+        IConfiguration configuration)
     {
         BasePath = configuration.GetValue(nameof(Arguments.BasePath), Directory.GetCurrentDirectory());
 
@@ -38,21 +39,14 @@ public class ApplicationConfiguration
             return;
         }
 
+        // a named solution is taken as given, extension or not: whether it exists is the argument
+        // parser's call, so it can report a solution file it cannot find rather than quietly
+        // falling back to whatever solution happens to sit in the base path
         if (SolutionFile.IsAssigned())
         {
-            if (SolutionFile.EndsWith(".sln"))
-            {
-                return;
-            }
+            SolutionFile = SolutionFile.EndsWith(".sln") ? SolutionFile : $"{SolutionFile}.sln";
 
-            if (File.Exists(Path.Combine(BasePath, $"{SolutionFile}.sln")))
-            {
-                SolutionFile = $"{SolutionFile}.sln";
-
-                return;
-            }
-
-            SolutionFile = string.Empty;
+            return;
         }
 
         string[] files = Directory.GetFiles(BasePath, "*.sln", SearchOption.TopDirectoryOnly);
@@ -72,5 +66,10 @@ public class ApplicationConfiguration
         }
 
         SolutionFile = Path.GetFileName(files.First());
+    }
+
+    public bool ValidConfiguration()
+    {
+        return ArgumentParser.ValidateArguments(this);
     }
 }
