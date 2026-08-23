@@ -3,8 +3,8 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
+using ToolClasses.Projects;
 using ToolClasses.Solutions;
-using ToolInterfaces;
 
 namespace ToolClasses.UnitTest;
 
@@ -180,7 +180,7 @@ public class ProjectReferencesEngineTests
         File.WriteAllText(Path.Combine(_basePath, $"{SolutionName}.sln"), solution);
     }
 
-    private TestContext CreateContext(params string[] args)
+    private static TestContext CreateContext(params string[] args)
     {
         IConfiguration configuration = new ConfigurationBuilder()
             .AddCommandLine(args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments))
@@ -188,9 +188,15 @@ public class ProjectReferencesEngineTests
 
         ApplicationConfiguration applicationConfiguration = new(configuration);
 
-        SolutionReader solutionReader = new(new Solution(applicationConfiguration));
+        ArgumentParser argumentParser = new();
 
-        return new TestContext(new ProjectReferencesEngine(applicationConfiguration, new ArgumentParser(), solutionReader));
+        ProjectReader projectReader = new(applicationConfiguration);
+
+        SolutionReader solutionReader = new(new Solution(applicationConfiguration), applicationConfiguration);
+
+        ProjectNames projectNames = new(solutionReader, projectReader, applicationConfiguration);
+
+        return new TestContext(new ProjectReferencesEngine(applicationConfiguration, argumentParser, projectReader, projectNames));
     }
 
     private sealed class TestContext

@@ -10,25 +10,27 @@ public class SolutionReader
 {
     private readonly ISolution _solution;
 
-    public SolutionReader(ISolution solution)
+    public SolutionReader(ISolution solution, ApplicationConfiguration applicationConfiguration)
     {
         _solution = solution;
+
+        if (applicationConfiguration.SolutionFile.IsAssigned())
+        {
+            Execute();
+        }
     }
 
-    public void Execute()
+    private void Execute()
     {
         _solution
             .ReadSolutionLines()
             .BuildSolution()
             .BuildSolutionProjects()
-            .BuildSolutionProjectsFullName()
-            .BuildDotNetProjects();
+            .BuildSolutionProjectsFullName();
     }
 
     public List<string> GetFullProjectNames()
     {
-        return _solution.IsAssigned()
-            ? [.. _solution.SolutionProjects.Select(x => x.ProjectFileName)]
-            : [];
+        return [.. _solution.SolutionProjects.Select(x => x.ProjectFileName)];
     }
 }

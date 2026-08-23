@@ -81,12 +81,6 @@ internal static class SolutionExtensions
 
             return solution;
         }
-
-        public ISolution BuildDotNetProjects()
-        {
-
-            return solution;
-        }
     }
 
     public static SolutionProject BuildSolutionProject(this string solutionProjectLine)

@@ -4,7 +4,6 @@ using System.Linq;
 using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
-using ToolClasses.Solutions;
 using ToolInterfaces;
 
 namespace ToolClasses;
@@ -14,18 +13,20 @@ public class ProjectReferencesEngine
     private readonly ApplicationConfiguration _applicationConfiguration;
     private readonly ArgumentParser _argumentParser;
 
-    private ProjectReader? _projectReader;
+    private readonly ProjectReader _projectReader;
 
-    private readonly SolutionReader _solutionReader;
+    private readonly ProjectNames _projectNames;
 
     public ProjectReferencesEngine(
         ApplicationConfiguration applicationConfiguration,
         ArgumentParser argumentParser,
-        SolutionReader solutionReader)
+        ProjectReader projectReader,
+        ProjectNames projectNames)
     {
         _applicationConfiguration = applicationConfiguration;
         _argumentParser = argumentParser;
-        _solutionReader = solutionReader;
+        _projectReader = projectReader;
+        _projectNames = projectNames;
     }
 
     public void Execute()
@@ -35,18 +36,7 @@ public class ProjectReferencesEngine
             return;
         }
 
-        if (_applicationConfiguration.SolutionFile.IsAssigned())
-        {
-            _solutionReader.Execute();
-        }
-
-        _projectReader = new ProjectReader(_applicationConfiguration.BasePath);
-
-        // todo: GetFullProjectNames => introduce projectFileFinder, encapsulates solutionReader => projectReader GetFullProjectNames functionality extracted
-        // the solutionReader is injected, so it is always assigned: only the solution file tells us whether it has anything to offer
-        List<string> projectNames = _applicationConfiguration.SolutionFile.IsAssigned()
-            ? _solutionReader.GetFullProjectNames()
-            : _projectReader.GetFullProjectNames();
+        List<string> projectNames = _projectNames.GetFullProjectNames();
 
         // TODO : get projectReferenceTree of the solution
 
