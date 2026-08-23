@@ -33,17 +33,17 @@ public static class ArgumentParser
 
     private static bool HasValidArguments(ApplicationConfiguration applicationConfiguration)
     {
-        if (!Directory.Exists(applicationConfiguration.BasePath))
-        {
-            return false;
-        }
+        return Directory.Exists(applicationConfiguration.BasePath) && IsValidSolutionFile(applicationConfiguration);
+    }
 
-        if (applicationConfiguration.SolutionFile.IsAssigned())
-        {
-            return SolutionFileExists(applicationConfiguration);
-        }
+    private static bool IsValidSolutionFile(ApplicationConfiguration applicationConfiguration)
+    {
+        return !applicationConfiguration.SolutionFile.IsAssigned() || SolutionFileExists(applicationConfiguration);
+    }
 
-        return true;
+    private static bool SolutionFileExists(ApplicationConfiguration applicationConfiguration)
+    {
+        return File.Exists(GetSolutionFileName(applicationConfiguration));
     }
 
     private static bool ReportInvalidArguments(ApplicationConfiguration applicationConfiguration)
@@ -63,11 +63,6 @@ public static class ArgumentParser
         }
 
         return false;
-    }
-
-    private static bool SolutionFileExists(ApplicationConfiguration applicationConfiguration)
-    {
-        return File.Exists(GetSolutionFileName(applicationConfiguration));
     }
 
     private static string GetSolutionFileName(ApplicationConfiguration applicationConfiguration)
