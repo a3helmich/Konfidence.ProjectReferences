@@ -44,7 +44,7 @@ The project references tool is a console application which scans your .cs projec
 	![](./readme/redundant-txt.PNG)
 
 ### How to run
-- project-references : scans the solution named after your current folder, so 'c:\projects\myapp' uses 'myapp.sln'.
+- project-references : scans the solution named after your current folder, so 'c:\projects\myapp' uses 'myapp.sln', or 'myapp.slnx' when that is the one present.
 - project-references --AllProjects : scans all csproj projects in your current folder and all it's subfolders, ignoring any solution.
 - project-references --BasePath=c:\projects\myproject : uses 'c:\projects\myproject\myproject.sln'.
 - project-references --Solution=mysolution : scans only the csproj projects listed in 'mysolution.sln' in your current folder.
@@ -55,7 +55,7 @@ The project references tool is a console application which scans your .cs projec
 
 ### Arguments
 - --BasePath= folder to work from, and to scan for csproj files including it's subfolders. Defaults to the folder you run the tool from. A trailing separator is ignored. [--BasePath=mypath]
-- --Solution= name of the solution file, only the csproj files in the solution file are scanned. The '.sln' extension is optional. Without it the solution named after the base path folder is used, so a folder 'myapp' looks for 'myapp.sln'. When the solution cannot be found the tool reports it and stops. [--Solution=mysolution]/[--Solution=mysolution.sln]
+- --Solution= name of the solution file, only the csproj files in the solution file are scanned. Both '.sln' and '.slnx' are read. The extension is optional; leave it off and the '.sln' is preferred when both formats are present. Leave the whole argument off and the solution named after the base path folder is used, so a folder 'myapp' looks for 'myapp.sln' and then 'myapp.slnx'. When the solution cannot be found the tool reports it and stops. [--Solution=mysolution]/[--Solution=mysolution.slnx]
 - --AllProjects switch, ignores the solution altogether and scans every csproj file below the base path. This is the only way to scan projects which are not part of a solution. [--AllProjects]
 - --Help switch, shows the available arguments and exits. A successful run prints a one line reminder that it exists, a run which reports a problem shows the arguments straight away. [--Help]
 

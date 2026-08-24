@@ -8,8 +8,6 @@ public interface IDotNetProject
 
     bool SubProjectReferencesResolved { get; set; }
 
-    List<string> ProjectLines { get; }
-
     bool IsSdkProject { get; set; }
 
     List<string> ProjectReferences { get; }

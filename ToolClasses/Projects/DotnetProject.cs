@@ -11,8 +11,6 @@ internal class DotNetProject : IDotNetProject
 
     public bool IsSdkProject { get; set; } = false;
 
-    public List<string> ProjectLines { get; set; } = [];
-
     public List<string> ProjectReferences { get; set; } = [];
 
     public List<IDotNetProject> ReferencedProjects { get; set; } = [];

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Konfidence.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ToolClasses;
@@ -13,7 +15,7 @@ internal class Program
 {
     private static IServiceProvider? ServiceProvider { get; set; }
 
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         string[] commandLineArguments = args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments);
 
@@ -29,7 +31,7 @@ internal class Program
                 .AddSingleton(applicationConfiguration)
                 .AddSingleton<ProjectReferencesEngine>()
                 .AddSingleton<SolutionReader>()
-                .AddSingleton<ISolution, Solution>()
+
                 .AddSingleton<ProjectReader>()
                 .AddSingleton<ProjectNames>();
         });
@@ -38,6 +40,9 @@ internal class Program
 
         ProjectReferencesEngine? projectReferencesEngine = ServiceProvider.GetService<ProjectReferencesEngine>();
 
-        projectReferencesEngine?.Execute();
+        if (projectReferencesEngine.IsAssigned())
+        {
+            await projectReferencesEngine.Execute();
+        }
     }
 }

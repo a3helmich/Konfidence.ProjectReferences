@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
@@ -48,13 +49,13 @@ public class ProjectReferencesEngineTests
     }
 
     [TestMethod]
-    public void Execute_WithAllProjectsSwitch_ReportsRedundantReferencesFoundByScanningTheBasePath()
+    public async Task Execute_WithAllProjectsSwitch_ReportsRedundantReferencesFoundByScanningTheBasePath()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
 
         // Act
-        context.ProjectReferencesEngine.Execute();
+        await context.ProjectReferencesEngine.Execute();
 
         // Assert
         string redundant = ReadRedundantFile();
@@ -64,13 +65,13 @@ public class ProjectReferencesEngineTests
     }
 
     [TestMethod]
-    public void Execute_WithAllProjectsSwitch_DoesNotReportProjectsThatAreOnlyReferencedOnce()
+    public async Task Execute_WithAllProjectsSwitch_DoesNotReportProjectsThatAreOnlyReferencedOnce()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
 
         // Act
-        context.ProjectReferencesEngine.Execute();
+        await context.ProjectReferencesEngine.Execute();
 
         // Assert
         string redundant = ReadRedundantFile();
@@ -79,7 +80,7 @@ public class ProjectReferencesEngineTests
     }
 
     [TestMethod]
-    public void Execute_WithSolutionThatOmitsAProject_DoesNotReportTheOmittedProject()
+    public async Task Execute_WithSolutionThatOmitsAProject_DoesNotReportTheOmittedProject()
     {
         // Arrange
         WriteSolution("A", "B");
@@ -87,14 +88,14 @@ public class ProjectReferencesEngineTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
 
         // Act
-        context.ProjectReferencesEngine.Execute();
+        await context.ProjectReferencesEngine.Execute();
 
         // Assert
         AssertRedundantFileWasNotWritten();
     }
 
     [TestMethod]
-    public void Execute_WithAllProjectsSwitch_BypassesTheSolutionAndReportsProjectsOutsideIt()
+    public async Task Execute_WithAllProjectsSwitch_BypassesTheSolutionAndReportsProjectsOutsideIt()
     {
         // Arrange
         WriteSolution("A", "B");
@@ -102,7 +103,61 @@ public class ProjectReferencesEngineTests
         TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects", "--solution", SolutionName);
 
         // Act
-        context.ProjectReferencesEngine.Execute();
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, Path.Combine("A", "A.csproj"));
+        StringAssert.Contains(redundant, Path.Combine("C", "C.csproj"));
+    }
+
+    [TestMethod]
+    public async Task Execute_WithReferencesOnTheItemGroupLine_ReportsTheRedundantReference()
+    {
+        // Arrange
+        WriteProjectWithInlineReferences("A", "B", "C");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, Path.Combine("A", "A.csproj"));
+        StringAssert.Contains(redundant, Path.Combine("C", "C.csproj"));
+    }
+
+    [TestMethod]
+    public async Task Execute_WithReferencesCarryingExtraAttributes_ReportsTheRedundantReference()
+    {
+        // Arrange
+        WriteProjectWithDecoratedReferences("A", "B", "C");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, Path.Combine("A", "A.csproj"));
+        StringAssert.Contains(redundant, Path.Combine("C", "C.csproj"));
+    }
+
+    [TestMethod]
+    public async Task Execute_WithAnUnreadableProject_StillReportsTheReadableOnes()
+    {
+        // Arrange
+        WriteMalformedProject("D");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
 
         // Assert
         string redundant = ReadRedundantFile();
@@ -166,6 +221,60 @@ public class ProjectReferencesEngineTests
         File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
     }
 
+    private void WriteProjectWithInlineReferences(string projectName, params string[] referencedProjectNames)
+    {
+        string projectFolder = Path.Combine(_basePath, projectName);
+
+        Directory.CreateDirectory(projectFolder);
+
+        string references = string.Empty;
+
+        foreach (string referencedProjectName in referencedProjectNames)
+        {
+            string reference = $@"<ProjectReference Include=""..\{referencedProjectName}\{referencedProjectName}.csproj"" />";
+            references += reference;
+        }
+
+        string project = $@"<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup>{references}</ItemGroup>
+</Project>";
+
+        File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
+    }
+
+    private void WriteProjectWithDecoratedReferences(string projectName, params string[] referencedProjectNames)
+    {
+        string projectFolder = Path.Combine(_basePath, projectName);
+
+        Directory.CreateDirectory(projectFolder);
+
+        string references = string.Empty;
+
+        foreach (string referencedProjectName in referencedProjectNames)
+        {
+            references += $@"    <ProjectReference PrivateAssets=""all""{Environment.NewLine}                      Include=""..\{referencedProjectName}\{referencedProjectName}.csproj""{Environment.NewLine}                      OutputItemType=""Analyzer"" />{Environment.NewLine}";
+        }
+
+        string project = $@"<Project Sdk=""Microsoft.NET.Sdk"">
+  <ItemGroup Condition=""'$(Configuration)'=='Debug'"">
+{references}  </ItemGroup>
+</Project>";
+
+        File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
+    }
+
+    private void WriteMalformedProject(string projectName)
+    {
+        string projectFolder = Path.Combine(_basePath, projectName);
+
+        Directory.CreateDirectory(projectFolder);
+
+        File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), @"<Project Sdk=""Microsoft.NET.Sdk"">
+  <ItemGroup>
+</Project>");
+    }
+
     private void WriteSolution(params string[] projectNames)
     {
         string solution = $"Microsoft Visual Studio Solution File, Format Version 12.00{Environment.NewLine}";
@@ -189,7 +298,7 @@ public class ProjectReferencesEngineTests
 
         ProjectReader projectReader = new(applicationConfiguration);
 
-        SolutionReader solutionReader = new(new Solution(applicationConfiguration), applicationConfiguration);
+        SolutionReader solutionReader = new(applicationConfiguration);
 
         ProjectNames projectNames = new(solutionReader, projectReader, applicationConfiguration);
 

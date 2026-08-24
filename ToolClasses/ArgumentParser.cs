@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolInterfaces;
@@ -23,10 +23,9 @@ public static class ArgumentParser
             return true;
         }
 
-        if (ReportInvalidArguments(applicationConfiguration))
-        {
-            WriteUsage();
-        }
+        ReportInvalidArguments(applicationConfiguration);
+
+        WriteUsage();
 
         return false;
     }
@@ -46,23 +45,23 @@ public static class ArgumentParser
         return File.Exists(GetSolutionFileName(applicationConfiguration));
     }
 
-    private static bool ReportInvalidArguments(ApplicationConfiguration applicationConfiguration)
+    private static void ReportInvalidArguments(ApplicationConfiguration applicationConfiguration)
     {
         if (!Directory.Exists(applicationConfiguration.BasePath))
         {
             $"not found : path - '{applicationConfiguration.BasePath}'".WriteLine();
 
-            return true;
+            return;
         }
 
-        if (applicationConfiguration.SolutionFile.IsAssigned())
-        {
-            $"not found : solution file - '{GetSolutionFileName(applicationConfiguration)}'".WriteLine();
+        $"not found : solution file - '{GetReportedSolutionFileName(applicationConfiguration)}'".WriteLine();
+    }
 
-            return true;
-        }
+    private static string GetReportedSolutionFileName(ApplicationConfiguration applicationConfiguration)
+    {
+        string solutionName = Path.GetFileNameWithoutExtension(applicationConfiguration.SolutionFile);
 
-        return false;
+        return Path.Combine(applicationConfiguration.BasePath, $"{solutionName}.sln(x)");
     }
 
     private static string GetSolutionFileName(ApplicationConfiguration applicationConfiguration)
@@ -82,8 +81,9 @@ public static class ArgumentParser
         $"valid arguments : [--{Arguments.BasePath}={Arguments.BasePath}] [--{Arguments.Solution}={Arguments.Solution}] [--{Arguments.AllProjects}] [--{Arguments.Help}]".WriteLine();
 
         $"{Arguments.BasePath} : path to work from, defaults to the current folder".WriteLine();
-        $"{Arguments.Solution} : the solutionfile to parse to get the .csproj files, the '.sln' is optional.".WriteLine();
-        $"{new string(' ', Arguments.Solution.ToString().Length)}   without it the solution named after the {Arguments.BasePath} folder is used".WriteLine();
+        $"{Arguments.Solution} : the solutionfile to parse to get the .csproj files, '.sln' and '.slnx' are".WriteLine();
+        $"{new string(' ', Arguments.Solution.ToString().Length)}   both accepted and the extension is optional. Without it the solution".WriteLine();
+        $"{new string(' ', Arguments.Solution.ToString().Length)}   named after the {Arguments.BasePath} folder is used".WriteLine();
         $"{Arguments.AllProjects} : switch, scans every .csproj below {Arguments.BasePath} instead, ignoring any solution".WriteLine();
         $"{Arguments.Help} : switch, shows this text and exits".WriteLine();
 
