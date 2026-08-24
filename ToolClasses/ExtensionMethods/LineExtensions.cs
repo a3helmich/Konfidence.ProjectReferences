@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using Konfidence.Base;
 
 namespace ToolClasses.ExtensionMethods;
 
@@ -14,13 +13,6 @@ public static class LineExtensions
             Debug.WriteLine($"=> {line}");
 
             return line;
-        }
-
-        public string TrimQuotes()
-        {
-            return line.StartsWith("\"")
-                ? line.TrimStart("\"").TrimEnd("\"")
-                : line;
         }
     }
 }
