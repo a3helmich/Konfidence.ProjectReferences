@@ -173,6 +173,21 @@ public class ApplicationConfigurationTests
     }
 
     [TestMethod]
+    public void Constructor_WithARelativeBasePath_ResolvesItToAFullPath()
+    {
+        // Arrange
+        Directory.SetCurrentDirectory(Path.GetDirectoryName(_basePath)!);
+
+        TestContext context = CreateContext("--BasePath", Path.GetFileName(_basePath));
+
+        // Act
+        string basePath = context.ApplicationConfiguration.BasePath;
+
+        // Assert
+        Assert.AreEqual(_basePath, basePath);
+    }
+
+    [TestMethod]
     public void Constructor_WithoutBasePathArgument_FallsBackToTheCurrentDirectory()
     {
         // Arrange

@@ -296,7 +296,7 @@ public class ProjectReferencesEngineTests
 
         ApplicationConfiguration applicationConfiguration = new(configuration);
 
-        ProjectReader projectReader = new(applicationConfiguration);
+        ProjectReader projectReader = new();
 
         SolutionReader solutionReader = new(applicationConfiguration);
 

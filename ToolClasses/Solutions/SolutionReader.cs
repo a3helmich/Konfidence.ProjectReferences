@@ -24,12 +24,12 @@ public class SolutionReader
 
     public async Task<List<string>> GetFullProjectNames()
     {
-        if (!SolutionFileExists())
+        string solutionFileName = GetSolutionFileName();
+
+        if (!SolutionFileExists(solutionFileName))
         {
             return [];
         }
-
-        string solutionFileName = GetSolutionFileName();
 
         ISolutionSerializer? serializer = SolutionSerializers.GetSerializerByMoniker(solutionFileName);
 
@@ -42,18 +42,18 @@ public class SolutionReader
 
         string solutionPath = Path.GetDirectoryName(solutionFileName) ?? string.Empty;
 
-        return
-        [
-            .. solution
-                .SolutionProjects
-                .Where(IsDotNetProject)
-                .Select(solutionProject => Path.GetFullPath(Path.Combine(solutionPath, solutionProject.FilePath)))
-        ];
+        List<string> fullProjectNames = solution
+            .SolutionProjects
+            .Where(IsDotNetProject)
+            .Select(solutionProject => Path.GetFullPath(Path.Combine(solutionPath, solutionProject.FilePath)))
+            .ToList();
+
+        return fullProjectNames;
     }
 
-    private bool SolutionFileExists()
+    private bool SolutionFileExists(string solutionFileName)
     {
-        return _applicationConfiguration.SolutionFile.IsAssigned() && File.Exists(GetSolutionFileName());
+        return _applicationConfiguration.SolutionFile.IsAssigned() && File.Exists(solutionFileName);
     }
 
     private string GetSolutionFileName()

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Konfidence.Base;
 using ToolClasses.Solutions;
@@ -10,6 +12,7 @@ public class ProjectNames
     private readonly SolutionReader _solutionReader;
 
     private readonly ProjectReader _projectReader;
+
     private readonly ApplicationConfiguration _applicationConfiguration;
 
     public ProjectNames(
@@ -34,6 +37,13 @@ public class ProjectNames
             return await _solutionReader.GetFullProjectNames();
         }
 
-        return _projectReader.GetFullProjectNames();
+        return GetProjectNames();
+    }
+
+    private List<string> GetProjectNames()
+    {
+        return Directory
+            .GetFiles(_applicationConfiguration.BasePath, @"*.csproj", SearchOption.AllDirectories)
+            .ToList();
     }
 }
