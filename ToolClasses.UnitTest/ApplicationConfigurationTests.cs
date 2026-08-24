@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -133,6 +133,8 @@ public class ApplicationConfigurationTests
     public void Constructor_WithoutSolutionArgument_DerivesTheSolutionNameFromTheFolderName()
     {
         // Arrange
+        WriteFolderNamedSolution();
+
         TestContext context = CreateContext("--BasePath", _basePath);
 
         // Act
@@ -146,6 +148,8 @@ public class ApplicationConfigurationTests
     public void Constructor_WithATrailingSeparatorOnTheBasePath_DerivesTheSameSolutionName()
     {
         // Arrange
+        WriteFolderNamedSolution();
+
         TestContext context = CreateContext("--BasePath", $"{_basePath}{Path.DirectorySeparatorChar}");
 
         // Act
@@ -225,7 +229,7 @@ public class ApplicationConfigurationTests
     }
 
     [TestMethod]
-    public void Constructor_WithAMissingSolutionWithoutExtension_KeepsItSoTheParserCanReportIt()
+    public void Constructor_WithAMissingSolutionWithoutExtension_FallsThroughToTheSlnx()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", "Missing");
@@ -234,7 +238,73 @@ public class ApplicationConfigurationTests
         string solutionFile = context.ApplicationConfiguration.SolutionFile;
 
         // Assert
-        Assert.AreEqual("Missing.sln", solutionFile);
+        Assert.AreEqual("Missing.slnx", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithAnExplicitlyNamedSolutionEndingInSlnx_ResolvesThatSolution()
+    {
+        // Arrange
+        WriteSlnxSolution();
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", $"{SolutionName}.slnx");
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual($"{SolutionName}.slnx", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithASolutionNameAndOnlyASlnxPresent_ResolvesTheSlnx()
+    {
+        // Arrange
+        File.Delete(Path.Combine(_basePath, $"{SolutionName}.sln"));
+
+        WriteSlnxSolution();
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual($"{SolutionName}.slnx", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithBothSolutionFormatsPresent_PrefersTheSln()
+    {
+        // Arrange
+        WriteSlnxSolution();
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual($"{SolutionName}.sln", solutionFile);
+    }
+
+    [TestMethod]
+    public void Constructor_WithoutSolutionArgumentAndOnlyASlnxPresent_DerivesTheSlnxFromTheFolderName()
+    {
+        // Arrange
+        File.Delete(Path.Combine(_basePath, $"{SolutionName}.sln"));
+
+        string folderName = Path.GetFileName(_basePath);
+
+        File.WriteAllText(Path.Combine(_basePath, $"{folderName}.slnx"), string.Empty);
+
+        TestContext context = CreateContext("--BasePath", _basePath);
+
+        // Act
+        string solutionFile = context.ApplicationConfiguration.SolutionFile;
+
+        // Assert
+        Assert.AreEqual($"{folderName}.slnx", solutionFile);
     }
 
     [TestMethod]
@@ -261,6 +331,16 @@ public class ApplicationConfigurationTests
 
         // Assert
         Assert.IsFalse(help);
+    }
+
+    private void WriteFolderNamedSolution()
+    {
+        File.WriteAllText(Path.Combine(_basePath, $"{Path.GetFileName(_basePath)}.sln"), string.Empty);
+    }
+
+    private void WriteSlnxSolution()
+    {
+        File.WriteAllText(Path.Combine(_basePath, $"{SolutionName}.slnx"), string.Empty);
     }
 
     private static TestContext CreateContext(params string[] args)

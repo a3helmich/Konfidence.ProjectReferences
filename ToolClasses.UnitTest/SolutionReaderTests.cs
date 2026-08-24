@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
@@ -35,7 +36,7 @@ public class SolutionReaderTests
     }
 
     [TestMethod]
-    public void Constructor_WithASolutionFile_ReadsTheProjectsInThatSolution()
+    public async Task Constructor_WithASolutionFile_ReadsTheProjectsInThatSolution()
     {
         // Arrange
         WriteSolution("A", "B");
@@ -44,13 +45,28 @@ public class SolutionReaderTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
 
         // Assert
-        List<string> projectNames = context.SolutionReader.GetFullProjectNames();
+        List<string> projectNames = await context.SolutionReader.GetFullProjectNames();
 
         CollectionAssert.AreEquivalent(new[] { ProjectFile("A"), ProjectFile("B") }, projectNames);
     }
 
     [TestMethod]
-    public void Constructor_WithAMissingSolutionFile_DoesNotThrow()
+    public async Task Constructor_WithASlnxSolutionFile_ReadsTheProjectsInThatSolution()
+    {
+        // Arrange
+        WriteSlnxSolution("A", "B");
+
+        // Act
+        TestContext context = CreateContext("--BasePath", _basePath, "--solution", $"{SolutionName}.slnx");
+
+        // Assert
+        List<string> projectNames = await context.SolutionReader.GetFullProjectNames();
+
+        CollectionAssert.AreEquivalent(new[] { ProjectFile("A"), ProjectFile("B") }, projectNames);
+    }
+
+    [TestMethod]
+    public async Task Constructor_WithAMissingSolutionFile_DoesNotThrow()
     {
         // Arrange
         WriteSolution("A");
@@ -63,7 +79,7 @@ public class SolutionReaderTests
     }
 
     [TestMethod]
-    public void Constructor_WithAMissingSolutionFile_ReadsNoProjects()
+    public async Task Constructor_WithAMissingSolutionFile_ReadsNoProjects()
     {
         // Arrange
         WriteSolution("A");
@@ -71,20 +87,20 @@ public class SolutionReaderTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", "Missing.sln");
 
         // Act
-        List<string> projectNames = context.SolutionReader.GetFullProjectNames();
+        List<string> projectNames = await context.SolutionReader.GetFullProjectNames();
 
         // Assert
         Assert.AreEqual(0, projectNames.Count);
     }
 
     [TestMethod]
-    public void Constructor_WithoutASolutionFile_ReadsNoProjects()
+    public async Task Constructor_WithoutASolutionFile_ReadsNoProjects()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath);
 
         // Act
-        List<string> projectNames = context.SolutionReader.GetFullProjectNames();
+        List<string> projectNames = await context.SolutionReader.GetFullProjectNames();
 
         // Assert
         Assert.AreEqual(0, projectNames.Count);
@@ -108,6 +124,20 @@ public class SolutionReaderTests
         File.WriteAllText(Path.Combine(_basePath, $"{SolutionName}.sln"), solution);
     }
 
+    private void WriteSlnxSolution(params string[] projectNames)
+    {
+        string solution = $"<Solution>{Environment.NewLine}";
+
+        foreach (string projectName in projectNames)
+        {
+            solution += $@"  <Project Path=""{projectName}\{projectName}.csproj"" />{Environment.NewLine}";
+        }
+
+        solution += "</Solution>";
+
+        File.WriteAllText(Path.Combine(_basePath, $"{SolutionName}.slnx"), solution);
+    }
+
     private static TestContext CreateContext(params string[] args)
     {
         IConfiguration configuration = new ConfigurationBuilder()
@@ -116,7 +146,7 @@ public class SolutionReaderTests
 
         ApplicationConfiguration applicationConfiguration = new(configuration);
 
-        return new TestContext(new SolutionReader(new Solution(applicationConfiguration), applicationConfiguration));
+        return new TestContext(new SolutionReader(applicationConfiguration));
     }
 
     private sealed class TestContext

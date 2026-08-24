@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
 using JetBrains.Annotations;
 using Konfidence.Base;
 using ToolInterfaces;
@@ -11,63 +12,56 @@ namespace ToolClasses.ExtensionMethods;
 [UsedImplicitly]
 internal static class ProjectExtensions
 {
+    private const string SdkAttribute = "Sdk";
+
+    private const string IncludeAttribute = "Include";
+
+    private const string ProjectReferenceElement = "ProjectReference";
+
     extension(IDotNetProject dotNetProject)
     {
         public IDotNetProject BuildDotnetProject()
         {
-            dotNetProject
-                .ReadProjectLines()
-                .SetProjectProperties()
-                .BuildProjectReferences();
+            XElement? projectElement = dotNetProject.ReadProjectElement();
 
-            return dotNetProject;
-        }
-
-        private IDotNetProject ReadProjectLines()
-        {
-            using StreamReader sr = new(dotNetProject.FileName);
-
-            string? line;
-
-            while (!(line = sr.ReadLine()).IsEof())
+            if (projectElement.IsAssigned())
             {
-                dotNetProject.ProjectLines.Add(line.Trim());
+                dotNetProject.SetProjectProperties(projectElement);
+                dotNetProject.BuildProjectReferences(projectElement);
             }
 
             return dotNetProject;
         }
 
-        private IDotNetProject SetProjectProperties()
+        private XElement? ReadProjectElement()
         {
-            const string project = @"<project ";
-            const string sdk = @"sdk=";
+            try
+            {
+                return XDocument.Load(dotNetProject.FileName).Root;
+            }
+            catch (XmlException xmlException)
+            {
+                $"unreadable project - '{dotNetProject.FileName}' : {xmlException.Message}".WriteLine();
 
-            List<string> projectLines = dotNetProject.ProjectLines;
-
-            dotNetProject.IsSdkProject = projectLines
-                .Where(line => line.StartsWith(project, StringComparison.OrdinalIgnoreCase))
-                .Select(line => line.TrimStartIgnoreCase(project))
-                .Any(line => line.StartsWith(sdk, StringComparison.OrdinalIgnoreCase));
-
-            return dotNetProject;
+                return null;
+            }
         }
 
-        // ReSharper disable once UnusedMethodReturnValue.Local
-        private IDotNetProject BuildProjectReferences()
+        private void SetProjectProperties(XElement projectElement)
+        {
+            dotNetProject.IsSdkProject = projectElement.Attribute(SdkAttribute).IsAssigned();
+        }
+
+        private void BuildProjectReferences(XElement projectElement)
         {
             string projectPath = Path.GetDirectoryName(dotNetProject.FileName) ?? string.Empty;
 
-            List<string> projectReferences = dotNetProject.ProjectLines
-                .Where(line => line.StartsWith(@"<ProjectReference Include=", StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            dotNetProject.ProjectReferences.AddRange(projectReferences
-                .Select(line => line.TrimStartIgnoreCase(@"<ProjectReference Include="))
-                .Select(line => line.TrimEnd(@"/>").TrimEnd(@">"))
-                .Select(line => line.TrimQuotes())
-                .Select(projectName => Path.GetFullPath(Path.Combine(projectPath, projectName))));
-
-            return dotNetProject;
+            dotNetProject.ProjectReferences.AddRange(projectElement
+                .Descendants()
+                .Where(element => element.Name.LocalName == ProjectReferenceElement)
+                .Select(element => (string?)element.Attribute(IncludeAttribute))
+                .Where(include => include.IsAssigned())
+                .Select(include => Path.GetFullPath(Path.Combine(projectPath, include!))));
         }
 
         public IEnumerable<IDotNetProject> GetSubProjectReferences()

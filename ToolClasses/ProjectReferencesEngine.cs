@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
@@ -26,14 +27,14 @@ public class ProjectReferencesEngine
         _projectNames = projectNames;
     }
 
-    public void Execute()
+    public async Task Execute()
     {
         if (!_applicationConfiguration.ValidConfiguration())
         {
             return;
         }
 
-        List<string> projectNames = _projectNames.GetFullProjectNames();
+        List<string> projectNames = await _projectNames.GetFullProjectNames();
 
         // TODO : get projectReferenceTree of the solution
 
@@ -57,28 +58,25 @@ public class ProjectReferencesEngine
             return;
         }
 
-        using StreamWriter sw = new(@".\redundant.txt");
+        await using StreamWriter sw = new(@".\redundant.txt");
 
-        if (_applicationConfiguration.SolutionFile.IsAssigned())
-        {
-            $"Redundant project references in solution '{_applicationConfiguration.SolutionFile}':".WriteLine();
-        }
-        else
-        {
-            "Redundant project references:".WriteLine();
-        }
+        string solutionText = _applicationConfiguration.SolutionFile.IsAssigned()
+            ? $" in solution '{_applicationConfiguration.SolutionFile}': "
+            : ": ";
+
+        $"Redundant project references{solutionText}".WriteLine();
 
         foreach (IDotNetProject projectWithRedundantReferences in projectsWithRedundantReferences)
         {
-            string line = $@"{projectWithRedundantReferences.FileName.TrimStartIgnoreCase(_applicationConfiguration.BasePath)}".WriteLine();
+            string line = $"{projectWithRedundantReferences.FileName.TrimStartIgnoreCase(_applicationConfiguration.BasePath)}".WriteLine();
 
-            sw.WriteLine(line);
+            await sw.WriteLineAsync(line);
 
             foreach (IDotNetProject redundantReferencedProject in projectWithRedundantReferences.RedundantReferencedProjects)
             {
-                line = $@"{tab} - {redundantReferencedProject.FileName.TrimStartIgnoreCase(_applicationConfiguration.BasePath)}".WriteLine();
+                line = $"{tab} - {redundantReferencedProject.FileName.TrimStartIgnoreCase(_applicationConfiguration.BasePath)}".WriteLine();
 
-                sw.WriteLine(line);
+                await sw.WriteLineAsync(line);
             }
         }
 

@@ -1,3 +1,4 @@
+﻿using System;
 using System.IO;
 using Konfidence.Base;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +8,10 @@ namespace ToolClasses;
 
 public class ApplicationConfiguration
 {
+    private const string SolutionExtension = ".sln";
+
+    private const string SolutionXmlExtension = ".slnx";
+
     public string BasePath { get; }
 
     public string SolutionFile { get; }
@@ -40,7 +45,7 @@ public class ApplicationConfiguration
 
         if (SolutionFile.IsAssigned())
         {
-            SolutionFile = SolutionFile.EndsWith(".sln") ? SolutionFile : $"{SolutionFile}.sln";
+            SolutionFile = ResolveSolutionFile(SolutionFile);
 
             return;
         }
@@ -49,8 +54,31 @@ public class ApplicationConfiguration
 
         if (topPath.IsAssigned())
         {
-            SolutionFile = $"{topPath}.sln";
+            SolutionFile = ResolveSolutionFile(topPath);
         }
+    }
+
+    private string ResolveSolutionFile(string solutionName)
+    {
+        if (HasSolutionExtension(solutionName))
+        {
+            return solutionName;
+        }
+
+        string solutionFile = $"{solutionName}{SolutionExtension}";
+
+        if (File.Exists(Path.Combine(BasePath, solutionFile)))
+        {
+            return solutionFile;
+        }
+
+        return $"{solutionName}{SolutionXmlExtension}";
+    }
+
+    private static bool HasSolutionExtension(string solutionName)
+    {
+        return solutionName.EndsWith(SolutionExtension, StringComparison.OrdinalIgnoreCase)
+               || solutionName.EndsWith(SolutionXmlExtension, StringComparison.OrdinalIgnoreCase);
     }
 
     public bool ValidConfiguration()

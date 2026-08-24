@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Konfidence.Base;
 using ToolClasses.Solutions;
 
@@ -26,10 +27,13 @@ public class ProjectNames
         return _applicationConfiguration.SolutionFile.IsAssigned() && !_applicationConfiguration.AllProjects;
     }
 
-    public List<string> GetFullProjectNames()
+    public async Task<List<string>> GetFullProjectNames()
     {
-        return ProjectNamesFromSolutionValid()
-            ? _solutionReader.GetFullProjectNames()
-            : _projectReader.GetFullProjectNames();
+        if (ProjectNamesFromSolutionValid())
+        {
+            return await _solutionReader.GetFullProjectNames();
+        }
+
+        return _projectReader.GetFullProjectNames();
     }
 }

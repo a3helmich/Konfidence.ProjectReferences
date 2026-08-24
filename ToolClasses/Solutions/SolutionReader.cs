@@ -1,43 +1,68 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Konfidence.Base;
-using ToolClasses.ExtensionMethods;
-using ToolInterfaces;
+using Microsoft.VisualStudio.SolutionPersistence;
+using Microsoft.VisualStudio.SolutionPersistence.Model;
+using Microsoft.VisualStudio.SolutionPersistence.Serializer;
 
 namespace ToolClasses.Solutions;
 
 public class SolutionReader
 {
-    private readonly ISolution _solution;
+    private const string ProjectExtension = ".csproj";
 
-    public SolutionReader(ISolution solution, ApplicationConfiguration applicationConfiguration)
+    private readonly ApplicationConfiguration _applicationConfiguration;
+
+    public SolutionReader(ApplicationConfiguration applicationConfiguration)
     {
-        _solution = solution;
+        _applicationConfiguration = applicationConfiguration;
+    }
 
-        if (SolutionFileExists(applicationConfiguration))
+    public async Task<List<string>> GetFullProjectNames()
+    {
+        if (!SolutionFileExists())
         {
-            Execute();
+            return [];
         }
+
+        string solutionFileName = GetSolutionFileName();
+
+        ISolutionSerializer? serializer = SolutionSerializers.GetSerializerByMoniker(solutionFileName);
+
+        if (!serializer.IsAssigned())
+        {
+            return [];
+        }
+
+        SolutionModel solution = await serializer.OpenAsync(solutionFileName, CancellationToken.None);
+
+        string solutionPath = Path.GetDirectoryName(solutionFileName) ?? string.Empty;
+
+        return
+        [
+            .. solution
+                .SolutionProjects
+                .Where(IsDotNetProject)
+                .Select(solutionProject => Path.GetFullPath(Path.Combine(solutionPath, solutionProject.FilePath)))
+        ];
     }
 
-    private static bool SolutionFileExists(ApplicationConfiguration applicationConfiguration)
+    private bool SolutionFileExists()
     {
-        return applicationConfiguration.SolutionFile.IsAssigned()
-               && File.Exists(Path.Combine(applicationConfiguration.BasePath, applicationConfiguration.SolutionFile));
+        return _applicationConfiguration.SolutionFile.IsAssigned() && File.Exists(GetSolutionFileName());
     }
 
-    private void Execute()
+    private string GetSolutionFileName()
     {
-        _solution
-            .ReadSolutionLines()
-            .BuildSolution()
-            .BuildSolutionProjects()
-            .BuildSolutionProjectsFullName();
+        return Path.Combine(_applicationConfiguration.BasePath, _applicationConfiguration.SolutionFile);
     }
 
-    public List<string> GetFullProjectNames()
+    private static bool IsDotNetProject(SolutionProjectModel solutionProject)
     {
-        return [.. _solution.SolutionProjects.Select(x => x.ProjectFileName)];
+        return solutionProject.Extension.Equals(ProjectExtension, StringComparison.OrdinalIgnoreCase);
     }
 }
