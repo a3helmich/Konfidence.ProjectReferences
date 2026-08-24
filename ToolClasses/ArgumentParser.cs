@@ -78,8 +78,11 @@ public static class ArgumentParser
     {
         new string('=', 78).WriteLine();
 
-        "reports project/package references a project already gets through another project it".WriteLine();
-        "references".WriteLine();
+        "reports project/package references a project already gets another way : through a project".WriteLine();
+        "it references, or through another package it references".WriteLine();
+        string.Empty.WriteLine();
+        "package dependencies are read from the restore output, so packages a project gets through".WriteLine();
+        "another package are only checked once that project has been restored".WriteLine();
         string.Empty.WriteLine();
 
         $"valid arguments : [--{Arguments.BasePath}={Arguments.BasePath}] [--{Arguments.Solution}={Arguments.Solution}] [--{Arguments.AllProjects}] [--{Arguments.Help}]".WriteLine();

@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.SolutionPersistence;
 using Microsoft.VisualStudio.SolutionPersistence.Model;
 using Microsoft.VisualStudio.SolutionPersistence.Serializer;
 
-namespace ToolClasses.Solutions;
+namespace ToolClasses.Readers;
 
 public class SolutionReader
 {

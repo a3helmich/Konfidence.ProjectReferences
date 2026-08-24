@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ToolClasses.Projects;
 using ToolClasses.ExtensionMethods;
 using ToolInterfaces;
 
-namespace ToolClasses.Projects;
+namespace ToolClasses.Readers;
 
 public class ProjectReader
 {

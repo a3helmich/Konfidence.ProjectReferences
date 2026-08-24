@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using ToolClasses;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
-using ToolClasses.Solutions;
+using ToolClasses.Readers;
 using ToolInterfaces;
 
 namespace ProjectReferencesTool;

@@ -7,13 +7,17 @@ internal class DotNetProject : IDotNetProject
 {
     public string FileName { get; }
 
-    public bool SubProjectReferencesResolved { get; set; } = false;
-
     public bool IsSdkProject { get; set; } = false;
 
     public List<string> ProjectReferences { get; set; } = [];
 
     public List<string> PackageReferences { get; set; } = [];
+
+    public List<string> PrivatePackageReferences { get; set; } = [];
+
+    public List<string> ReferencedSubPackages { get; set; } = [];
+
+    public bool PackageReferencesMissing { get; set; } = false;
 
     public List<IDotNetProject> ReferencedProjects { get; set; } = [];
 

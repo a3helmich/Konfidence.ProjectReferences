@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
-using ToolClasses.Solutions;
+using ToolClasses.Readers;
 
 namespace ToolClasses.UnitTest;
 
@@ -221,6 +222,114 @@ public class ProjectReferencesEngineTests
         StringAssert.Contains(redundant, "Newtonsoft.Json");
     }
 
+    [TestMethod]
+    public async Task Execute_WithAPackageAlreadyBroughtByAnotherPackage_ReportsItAsRedundant()
+    {
+        // Arrange
+        WriteProject("A", [], "Outer", "Inner");
+        WriteAssetsFile("A", ("Outer", ["Inner"]), ("Inner", []));
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, "Inner.nupkg");
+    }
+
+    [TestMethod]
+    public async Task Execute_WithAPackageBroughtThroughAChainOfPackages_ReportsItAsRedundant()
+    {
+        // Arrange
+        WriteProject("A", [], "Outer", "Deepest");
+        WriteAssetsFile("A", ("Outer", ["Middle"]), ("Middle", ["Deepest"]), ("Deepest", []));
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, "Deepest.nupkg");
+    }
+
+    [TestMethod]
+    public async Task Execute_WithUnrelatedPackages_DoesNotReportThem()
+    {
+        // Arrange
+        WriteProject("A", [], "Outer", "Unrelated");
+        WriteAssetsFile("A", ("Outer", ["Inner"]), ("Inner", []), ("Unrelated", []));
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        AssertRedundantFileWasNotWritten();
+    }
+
+    [TestMethod]
+    public async Task Execute_WithoutRestoreOutput_DoesNotReportPackagesBroughtByOtherPackages()
+    {
+        // Arrange
+        WriteProject("A", [], "Outer", "Inner");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        AssertRedundantFileWasNotWritten();
+    }
+
+    [TestMethod]
+    public async Task Execute_WithAnUnrelatedProjectWalkedFirst_StillReportsTheRedundantReference()
+    {
+        // Arrange
+        // B -> E is redundant: E is reachable as B -> C -> D -> E.
+        // A only references B, so it must not change what is reported for B.
+        WriteProject("E", []);
+        WriteProject("D", ["E"]);
+        WriteProject("C", ["D"]);
+        WriteProject("B", ["C", "E"]);
+        WriteProject("A", ["B"]);
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, Path.Combine("B", "B.csproj"));
+        StringAssert.Contains(redundant, Path.Combine("E", "E.csproj"));
+    }
+
+    [TestMethod]
+    public async Task Execute_WithAPrivateAssetsPackageInAReferencedProject_DoesNotReportItAsRedundant()
+    {
+        // Arrange
+        WriteProjectWithPrivatePackage("C", "Serilog");
+        WriteProject("B", ["C"]);
+        WriteProject("A", ["B"], "Serilog");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        AssertRedundantFileWasNotWritten();
+    }
+
     private string ReadRedundantFile()
     {
         string redundantFile = Path.Combine(_outputPath, RedundantFileName);
@@ -303,6 +412,23 @@ public class ProjectReferencesEngineTests
         File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
     }
 
+    private void WriteProjectWithPrivatePackage(string projectName, string packageName)
+    {
+        string projectFolder = Path.Combine(_basePath, projectName);
+
+        Directory.CreateDirectory(projectFolder);
+
+        string project = $@"<Project Sdk=""Microsoft.NET.Sdk"">
+  <ItemGroup>
+    <PackageReference Include=""{packageName}"" Version=""1.0.0"">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>";
+
+        File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
+    }
+
     private void WriteProjectWithInlineReferences(string projectName, params string[] referencedProjectNames)
     {
         string projectFolder = Path.Combine(_basePath, projectName);
@@ -357,6 +483,33 @@ public class ProjectReferencesEngineTests
 </Project>");
     }
 
+    private void WriteAssetsFile(string projectName, params (string Package, string[] Dependencies)[] packages)
+    {
+        string assetsFolder = Path.Combine(_basePath, projectName, "obj");
+
+        Directory.CreateDirectory(assetsFolder);
+
+        string libraries = string.Empty;
+
+        foreach ((string package, string[] dependencies) in packages)
+        {
+            string dependencyEntries = string.Join(", ", dependencies.Select(dependency => $@"""{dependency}"": ""1.0.0"""));
+
+            libraries += $@"      ""{package}/1.0.0"": {{ ""type"": ""package"", ""dependencies"": {{ {dependencyEntries} }} }},";
+        }
+
+        string assets = $@"{{
+  ""version"": 3,
+  ""targets"": {{
+    ""net10.0"": {{
+{libraries.TrimEnd(',')}
+    }}
+  }}
+}}";
+
+        File.WriteAllText(Path.Combine(assetsFolder, "project.assets.json"), assets);
+    }
+
     private void WriteSolution(params string[] projectNames)
     {
         string solution = $"Microsoft Visual Studio Solution File, Format Version 12.00{Environment.NewLine}";
@@ -382,7 +535,7 @@ public class ProjectReferencesEngineTests
 
         SolutionReader solutionReader = new(applicationConfiguration);
 
-        ProjectNames projectNames = new(solutionReader, projectReader, applicationConfiguration);
+        ProjectNames projectNames = new(solutionReader, applicationConfiguration);
 
         return new TestContext(new ProjectReferencesEngine(applicationConfiguration, projectReader, projectNames));
     }

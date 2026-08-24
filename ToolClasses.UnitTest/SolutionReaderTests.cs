@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
-using ToolClasses.Solutions;
+using ToolClasses.Readers;
 
 namespace ToolClasses.UnitTest;
 

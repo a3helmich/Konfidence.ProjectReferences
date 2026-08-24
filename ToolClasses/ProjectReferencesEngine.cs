@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
+using ToolClasses.Readers;
 using ToolInterfaces;
 
 namespace ToolClasses;
@@ -44,6 +45,7 @@ public class ProjectReferencesEngine
             .Execute(projectNames)
             .ExtendProjectsWithProjectReferences()
             .ExtendProjectsWithAllSubProjectReferences()
+            .ExtendProjectsWithAllSubPackageReferences()
             .ExtendProjectsWithAllRedundantProjectReferences()
             .ExtendProjectsWithAllRedundantPackageReferences();
 
@@ -51,6 +53,13 @@ public class ProjectReferencesEngine
             .SdkProjects
             .Where(x => x.RedundantReferencedProjects.Any() || x.RedundantPackageReferences.Any())
             .ToList();
+
+        int projectsWithoutPackageReferences = _projectReader.SdkProjects.Count(x => x.PackageReferencesMissing);
+
+        if (projectsWithoutPackageReferences > 0)
+        {
+            $"note : {projectsWithoutPackageReferences} project(s) have no restore output, package dependencies were not checked for them".WriteLine();
+        }
 
         string tab = new(' ', 4);
 

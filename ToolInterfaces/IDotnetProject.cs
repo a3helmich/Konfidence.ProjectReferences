@@ -6,13 +6,17 @@ public interface IDotNetProject
 {
     string FileName { get; }
 
-    bool SubProjectReferencesResolved { get; set; }
-
     bool IsSdkProject { get; set; }
 
     List<string> ProjectReferences { get; }
 
     List<string> PackageReferences { get; }
+
+    List<string> PrivatePackageReferences { get; }
+
+    List<string> ReferencedSubPackages { get; }
+
+    bool PackageReferencesMissing { get; set; }
 
     List<IDotNetProject> ReferencedProjects { get; }
 

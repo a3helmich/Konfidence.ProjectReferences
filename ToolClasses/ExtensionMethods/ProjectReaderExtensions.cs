@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.Annotations;
 using ToolClasses.Projects;
+using ToolClasses.Readers;
 using ToolInterfaces;
 
 namespace ToolClasses.ExtensionMethods;
@@ -39,6 +40,16 @@ internal static class ProjectReaderExtensions
             return projectReader;
         }
 
+        public ProjectReader ExtendProjectsWithAllSubPackageReferences()
+        {
+            foreach (IDotNetProject sdkProject in projectReader.SdkProjects)
+            {
+                sdkProject.ReferencedSubPackages.AddRange(sdkProject.GetSubPackageReferences());
+            }
+
+            return projectReader;
+        }
+
         public ProjectReader ExtendProjectsWithAllRedundantProjectReferences()
         {
             foreach (IDotNetProject sdkProject in projectReader.SdkProjects)
@@ -57,11 +68,15 @@ internal static class ProjectReaderExtensions
         {
             foreach (IDotNetProject sdkProject in projectReader.SdkProjects)
             {
-                List<string> packageReferencesFromReferencedProjects = sdkProject.GetPackageReferencesFromReferencedProjects();
+                List<string> packagesFromElsewhere =
+                [
+                    .. sdkProject.GetPackageReferencesFromReferencedProjects(),
+                    .. sdkProject.ReferencedSubPackages
+                ];
 
                 IEnumerable<string> redundantPackageReferences = sdkProject
                     .PackageReferences
-                    .Where(packageReference => packageReferencesFromReferencedProjects.Any(referencedPackage => referencedPackage == packageReference));
+                    .Where(packageReference => packagesFromElsewhere.Any(referencedPackage => referencedPackage == packageReference));
 
                 sdkProject.RedundantPackageReferences.AddRange(redundantPackageReferences);
             }
