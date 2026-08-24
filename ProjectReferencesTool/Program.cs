@@ -7,7 +7,6 @@ using ToolClasses;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
 using ToolClasses.Readers;
-using ToolInterfaces;
 
 namespace ProjectReferencesTool;
 
@@ -25,7 +24,7 @@ internal class Program
             context,
             services) =>
         {
-            ApplicationConfiguration applicationConfiguration = new(context.Configuration);
+            ApplicationConfiguration applicationConfiguration = new(context.Configuration, commandLineArguments);
 
             services
                 .AddSingleton(applicationConfiguration)
@@ -33,7 +32,8 @@ internal class Program
                 .AddSingleton<SolutionReader>()
 
                 .AddSingleton<ProjectReader>()
-                .AddSingleton<ProjectNames>();
+                .AddSingleton<ProjectNames>()
+                .AddSingleton<RedundancyReport>();
         });
 
         ServiceProvider = hostBuilder.Build().Services;

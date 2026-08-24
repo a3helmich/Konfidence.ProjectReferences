@@ -73,7 +73,17 @@ Redundant project/package references:
 - --AllProjects switch, ignores the solution altogether and scans every csproj file below the base path. This is the only way to scan projects which are not part of a solution. [--AllProjects]
 - --Help switch, shows the available arguments and exits. A successful run prints a one line reminder that it exists, a run which reports a problem shows the arguments straight away. [--Help]
 
-Both '--argument=value' and '--argument value' are accepted.
+Both '--argument=value' and '--argument value' are accepted. Always start an argument with '--':
+'--Solution mysolution' works, 'Solution mysolution' is not read at all. An argument the tool cannot
+read stops the run and is named, rather than being dropped and scanning something else instead:
+
+```
+> project-references solution mysolution.sln
+ignored : 'solution', 'mysolution.sln' - arguments start with --, see --Help
+==============================================================================
+valid arguments : [--BasePath=BasePath] [--Solution=Solution] [--AllProjects] [--Help]
+...
+```
 
 Arguments are case insensitive
 

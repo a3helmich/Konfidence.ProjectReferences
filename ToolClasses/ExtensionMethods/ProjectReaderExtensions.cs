@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using ToolClasses.Projects;
 using ToolClasses.Readers;
 using ToolInterfaces;
 
@@ -44,7 +43,11 @@ internal static class ProjectReaderExtensions
         {
             foreach (IDotNetProject sdkProject in projectReader.SdkProjects)
             {
-                sdkProject.ReferencedSubPackages.AddRange(sdkProject.GetSubPackageReferences());
+                PackageReader packageReader = PackageReader.Read(sdkProject.FileName);
+
+                sdkProject.PackageReferencesMissing = !packageReader.IsAvailable && sdkProject.PackageReferences.Any();
+
+                sdkProject.ReferencedSubPackages.AddRange(packageReader.GetSubPackageReferences(sdkProject.PackageReferences));
             }
 
             return projectReader;

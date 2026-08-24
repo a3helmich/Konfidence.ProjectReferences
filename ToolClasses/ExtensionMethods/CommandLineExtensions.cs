@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Konfidence.Base;
@@ -14,12 +14,49 @@ public static class CommandLineExtensions
 
     extension(string[] args)
     {
+        public List<string> GetIgnoredArguments()
+        {
+            List<string> ignoredArguments = [];
+
+            int index = 0;
+
+            while (index < args.Length)
+            {
+                string argument = args[index];
+
+                if (argument.Contains('='))
+                {
+                    index++;
+
+                    continue;
+                }
+
+                if (HasSwitchPrefix(argument))
+                {
+                    index += 2;
+
+                    continue;
+                }
+
+                ignoredArguments.Add(argument);
+
+                index++;
+            }
+
+            return ignoredArguments;
+        }
+
         public string[] ExpandSwitchArguments(params Arguments[] switchArguments)
         {
             List<string> switchNames = [.. switchArguments.Select(switchArgument => switchArgument.ToString())];
 
-            return [.. args.Select(argument => argument.ExpandSwitchArgument(switchNames))];
+            return args.Select(argument => argument.ExpandSwitchArgument(switchNames)).ToArray();
         }
+    }
+
+    private static bool HasSwitchPrefix(string argument)
+    {
+        return SwitchPrefixes.Any(switchPrefix => argument.StartsWith(switchPrefix, StringComparison.Ordinal));
     }
 
     extension(string argument)

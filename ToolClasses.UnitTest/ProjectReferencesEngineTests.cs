@@ -330,6 +330,42 @@ public class ProjectReferencesEngineTests
         AssertRedundantFileWasNotWritten();
     }
 
+    [TestMethod]
+    public async Task Execute_WithAPrivateAssetsAttributeInAReferencedProject_DoesNotReportItAsRedundant()
+    {
+        // Arrange
+        WriteProjectWithPrivatePackageAttribute("C", "Serilog");
+        WriteProject("B", ["C"]);
+        WriteProject("A", ["B"], "Serilog");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        AssertRedundantFileWasNotWritten();
+    }
+
+    [TestMethod]
+    public async Task Execute_WithAnAssetsFileHoldingProjectAndLeafEntries_StillReportsTheRedundantPackage()
+    {
+        // Arrange
+        // a real assets file also holds project entries and packages carrying no dependencies at all
+        WriteProject("A", [], "Outer", "Inner");
+        WriteRealisticAssetsFile("A");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, "Inner.nupkg");
+    }
+
     private string ReadRedundantFile()
     {
         string redundantFile = Path.Combine(_outputPath, RedundantFileName);
@@ -412,6 +448,21 @@ public class ProjectReferencesEngineTests
         File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
     }
 
+    private void WriteProjectWithPrivatePackageAttribute(string projectName, string packageName)
+    {
+        string projectFolder = Path.Combine(_basePath, projectName);
+
+        Directory.CreateDirectory(projectFolder);
+
+        string project = $@"<Project Sdk=""Microsoft.NET.Sdk"">
+  <ItemGroup>
+    <PackageReference Include=""{packageName}"" Version=""1.0.0"" PrivateAssets=""all"" />
+  </ItemGroup>
+</Project>";
+
+        File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
+    }
+
     private void WriteProjectWithPrivatePackage(string projectName, string packageName)
     {
         string projectFolder = Path.Combine(_basePath, projectName);
@@ -483,6 +534,26 @@ public class ProjectReferencesEngineTests
 </Project>");
     }
 
+    private void WriteRealisticAssetsFile(string projectName)
+    {
+        string assetsFolder = Path.Combine(_basePath, projectName, "obj");
+
+        Directory.CreateDirectory(assetsFolder);
+
+        string assets = @"{
+  ""version"": 3,
+  ""targets"": {
+    ""net10.0"": {
+      ""SomeReferencedProject/1.0.0"": { ""type"": ""project"", ""framework"": "".NETCoreApp,Version=v10.0"" },
+      ""Inner/1.0.0"": { ""type"": ""package"" },
+      ""Outer/1.0.0"": { ""type"": ""package"", ""dependencies"": { ""Inner"": ""1.0.0"" } }
+    }
+  }
+}";
+
+        File.WriteAllText(Path.Combine(assetsFolder, "project.assets.json"), assets);
+    }
+
     private void WriteAssetsFile(string projectName, params (string Package, string[] Dependencies)[] packages)
     {
         string assetsFolder = Path.Combine(_basePath, projectName, "obj");
@@ -525,11 +596,13 @@ public class ProjectReferencesEngineTests
 
     private static TestContext CreateContext(params string[] args)
     {
+        string[] expandedArguments = args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments);
+
         IConfiguration configuration = new ConfigurationBuilder()
-            .AddCommandLine(args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments))
+            .AddCommandLine(expandedArguments)
             .Build();
 
-        ApplicationConfiguration applicationConfiguration = new(configuration);
+        ApplicationConfiguration applicationConfiguration = new(configuration, expandedArguments);
 
         ProjectReader projectReader = new();
 
@@ -537,7 +610,7 @@ public class ProjectReferencesEngineTests
 
         ProjectNames projectNames = new(solutionReader, applicationConfiguration);
 
-        return new TestContext(new ProjectReferencesEngine(applicationConfiguration, projectReader, projectNames));
+        return new TestContext(new ProjectReferencesEngine(applicationConfiguration, projectReader, projectNames, new RedundancyReport(applicationConfiguration)));
     }
 
     private sealed class TestContext
