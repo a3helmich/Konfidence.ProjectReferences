@@ -12,9 +12,13 @@ public interface IDotNetProject
 
     List<string> ProjectReferences { get; }
 
+    List<string> PackageReferences { get; }
+
     List<IDotNetProject> ReferencedProjects { get; }
 
     List<IDotNetProject> ReferencedSubProjects { get; }
 
     List<IDotNetProject> RedundantReferencedProjects { get; }
+
+    List<string> RedundantPackageReferences { get; }
 }

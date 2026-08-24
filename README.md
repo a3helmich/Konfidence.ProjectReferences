@@ -1,18 +1,18 @@
 # ProjectReferences
 
-Report redundant project references
+Report redundant project/package references
 
 ## ProjectReferencesTool
 
-The project references tool is a console application which scans your .cs projects for redundant references to other projects.
+The project references tool is a console application which scans your .cs projects for redundant project/package references — the ones a project already gets through another project it references.
 
 ### Using the tool
 - package: The project references tool is published as a package on [nuget.org - Konfidence.Project-References](https://www.nuget.org/packages/Konfidence.Project-References).
 - install: run 'dotnet tool install --global Konfidence.Project-References'
 - basic run: in a console go to your solution folder and run 'project-references'. It scans the solution named after that folder, use '--AllProjects' to scan every project below it instead.
-- result 1: console displays redundant project references within the scanned projects.
+- result 1: console displays the redundant project/package references within the scanned projects. Project references are listed by their .csproj path, package references by name with a .nupkg extension.
 - result 2: creates a 'redundant.txt' file, which contains the results displayed in the console.
-- actions: manually update the references in your projects and remove the redundant project references
+- actions: manually update the references in your projects and remove the redundant ones. A redundant package reference is worth a second look before removing it — a deliberately pinned version, or 'PrivateAssets="all"' on the project that brings it, are both reasons to keep one.
 - where: because it is a dotnetcore console application, it runs on both windows and linux.
 - for whom: all dotnet c# developers creating solutions containing large amounts of projects.
  
@@ -38,6 +38,8 @@ The project references tool is a console application which scans your .cs projec
 - Running the tool would give:
 
 	![](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/console-output.PNG)
+
+	A package reference works the same way. If 'ToolClasses' references a package and our project references both 'ToolClasses' and that same package, our own package reference adds nothing — 'ToolClasses' already brings it.
 
 - Also creating the file 'redundant.txt':
 

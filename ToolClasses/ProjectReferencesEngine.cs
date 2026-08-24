@@ -11,6 +11,8 @@ namespace ToolClasses;
 
 public class ProjectReferencesEngine
 {
+    private const string PackageExtension = ".nupkg";
+
     private readonly ApplicationConfiguration _applicationConfiguration;
 
     private readonly ProjectReader _projectReader;
@@ -42,18 +44,19 @@ public class ProjectReferencesEngine
             .Execute(projectNames)
             .ExtendProjectsWithProjectReferences()
             .ExtendProjectsWithAllSubProjectReferences()
-            .ExtendProjectsWithAllRedundantProjectReferences();
+            .ExtendProjectsWithAllRedundantProjectReferences()
+            .ExtendProjectsWithAllRedundantPackageReferences();
 
         List<IDotNetProject> projectsWithRedundantReferences = _projectReader
             .SdkProjects
-            .Where(x => x.RedundantReferencedProjects.Any())
+            .Where(x => x.RedundantReferencedProjects.Any() || x.RedundantPackageReferences.Any())
             .ToList();
 
         string tab = new(' ', 4);
 
         if (!projectsWithRedundantReferences.Any())
         {
-            "No redundant project references found.".WriteLine();
+            "No redundant project/package references found.".WriteLine();
 
             return;
         }
@@ -64,7 +67,7 @@ public class ProjectReferencesEngine
             ? $" in solution '{_applicationConfiguration.SolutionFile}': "
             : ": ";
 
-        $"Redundant project references{solutionText}".WriteLine();
+        await sw.WriteLineAsync($"Redundant project/package references{solutionText}".WriteLine());
 
         foreach (IDotNetProject projectWithRedundantReferences in projectsWithRedundantReferences)
         {
@@ -75,6 +78,13 @@ public class ProjectReferencesEngine
             foreach (IDotNetProject redundantReferencedProject in projectWithRedundantReferences.RedundantReferencedProjects)
             {
                 line = $"{tab} - {redundantReferencedProject.FileName.TrimStartIgnoreCase(_applicationConfiguration.BasePath)}".WriteLine();
+
+                await sw.WriteLineAsync(line);
+            }
+
+            foreach (string redundantPackageReference in projectWithRedundantReferences.RedundantPackageReferences)
+            {
+                line = $"{tab} - {redundantPackageReference}{PackageExtension}".WriteLine();
 
                 await sw.WriteLineAsync(line);
             }

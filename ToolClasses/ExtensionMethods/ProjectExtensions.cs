@@ -18,6 +18,8 @@ internal static class ProjectExtensions
 
     private const string ProjectReferenceElement = "ProjectReference";
 
+    private const string PackageReferenceElement = "PackageReference";
+
     extension(IDotNetProject dotNetProject)
     {
         public IDotNetProject BuildDotnetProject()
@@ -28,6 +30,7 @@ internal static class ProjectExtensions
             {
                 dotNetProject.SetProjectProperties(projectElement);
                 dotNetProject.BuildProjectReferences(projectElement);
+                dotNetProject.BuildPackageReferences(projectElement);
             }
 
             return dotNetProject;
@@ -62,6 +65,28 @@ internal static class ProjectExtensions
                 .Select(element => (string?)element.Attribute(IncludeAttribute))
                 .Where(include => include.IsAssigned())
                 .Select(include => Path.GetFullPath(Path.Combine(projectPath, include!))));
+        }
+
+        private void BuildPackageReferences(XElement projectElement)
+        {
+            dotNetProject.PackageReferences.AddRange(projectElement
+                .Descendants()
+                .Where(element => element.Name.LocalName == PackageReferenceElement)
+                .Select(element => (string?)element.Attribute(IncludeAttribute))
+                .Where(include => include.IsAssigned())
+                .Select(include => include!));
+        }
+
+        public List<string> GetPackageReferencesFromReferencedProjects()
+        {
+            return
+            [
+                .. dotNetProject
+                    .ReferencedProjects
+                    .Concat(dotNetProject.ReferencedSubProjects)
+                    .SelectMany(referencedProject => referencedProject.PackageReferences)
+                    .Distinct()
+            ];
         }
 
         public IEnumerable<IDotNetProject> GetSubProjectReferences()

@@ -78,6 +78,10 @@ public static class ArgumentParser
     {
         new string('=', 78).WriteLine();
 
+        "reports project/package references a project already gets through another project it".WriteLine();
+        "references".WriteLine();
+        string.Empty.WriteLine();
+
         $"valid arguments : [--{Arguments.BasePath}={Arguments.BasePath}] [--{Arguments.Solution}={Arguments.Solution}] [--{Arguments.AllProjects}] [--{Arguments.Help}]".WriteLine();
 
         $"{Arguments.BasePath} : path to work from, defaults to the current folder".WriteLine();
