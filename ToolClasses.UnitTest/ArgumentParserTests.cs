@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -126,6 +126,36 @@ public class ArgumentParserTests
     }
 
     [TestMethod]
+    public void ValidateArguments_WithAnUnreadableArgument_ReturnsFalseSoNothingIsScanned()
+    {
+        // Arrange
+        WriteFolderNamedSolution();
+
+        TestContext context = CreateContext("--BasePath", _basePath, "solution", "mysolution.sln");
+
+        // Act
+        bool valid = ArgumentParser.ValidateArguments(context.ApplicationConfiguration);
+
+        // Assert
+        Assert.IsFalse(valid);
+    }
+
+    [TestMethod]
+    public void ValidateArguments_WithOnlyReadableArguments_ReturnsTrue()
+    {
+        // Arrange
+        WriteFolderNamedSolution();
+
+        TestContext context = CreateContext("--BasePath", _basePath);
+
+        // Act
+        bool valid = ArgumentParser.ValidateArguments(context.ApplicationConfiguration);
+
+        // Assert
+        Assert.IsTrue(valid);
+    }
+
+    [TestMethod]
     public void ValidateArguments_WithHelpSwitch_ReturnsFalseSoNothingIsScanned()
     {
         // Arrange
@@ -163,11 +193,13 @@ public class ArgumentParserTests
 
     private static TestContext CreateContext(params string[] args)
     {
+        string[] expandedArguments = args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments);
+
         IConfiguration configuration = new ConfigurationBuilder()
-            .AddCommandLine(args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments))
+            .AddCommandLine(expandedArguments)
             .Build();
 
-        return new TestContext(new ApplicationConfiguration(configuration));
+        return new TestContext(new ApplicationConfiguration(configuration, expandedArguments));
     }
 
     private sealed class TestContext

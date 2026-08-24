@@ -6,7 +6,6 @@ using System.Xml;
 using System.Xml.Linq;
 using JetBrains.Annotations;
 using Konfidence.Base;
-using ToolClasses.Readers;
 using ToolInterfaces;
 
 namespace ToolClasses.ExtensionMethods;
@@ -28,13 +27,36 @@ internal static class ProjectExtensions
 
     private static bool KeepsAssetsPrivate(XElement packageReference)
     {
-        string privateAssets = (string?)packageReference.Attribute(PrivateAssetsName)
-                               ?? packageReference
-                                   .Elements()
-                                   .FirstOrDefault(element => element.Name.LocalName == PrivateAssetsName)?.Value
-                               ?? string.Empty;
+        return GetPrivateAssets(packageReference).Equals(AllAssets, StringComparison.OrdinalIgnoreCase);
+    }
 
-        return privateAssets.Trim().Equals(AllAssets, StringComparison.OrdinalIgnoreCase);
+    private static string GetPrivateAssets(XElement packageReference)
+    {
+        string privateAssets = GetPrivateAssetsAttribute(packageReference);
+
+        return privateAssets.IsAssigned()
+            ? privateAssets
+            : GetPrivateAssetsElement(packageReference);
+    }
+
+    private static string GetPrivateAssetsAttribute(XElement packageReference)
+    {
+        string? privateAssets = (string?)packageReference.Attribute(PrivateAssetsName);
+
+        return privateAssets.IsAssigned()
+            ? privateAssets.Trim()
+            : string.Empty;
+    }
+
+    private static string GetPrivateAssetsElement(XElement packageReference)
+    {
+        string? privateAssets = packageReference
+            .Elements()
+            .FirstOrDefault(element => element.Name.LocalName == PrivateAssetsName)?.Value;
+
+        return privateAssets.IsAssigned()
+            ? privateAssets.Trim()
+            : string.Empty;
     }
 
     private static void AddSubProjectReferences(IDotNetProject project, HashSet<IDotNetProject> subProjectReferences)
@@ -54,12 +76,14 @@ internal static class ProjectExtensions
         {
             XElement? projectElement = dotNetProject.ReadProjectElement();
 
-            if (projectElement.IsAssigned())
+            if (!projectElement.IsAssigned())
             {
-                dotNetProject.SetProjectProperties(projectElement);
-                dotNetProject.BuildProjectReferences(projectElement);
-                dotNetProject.BuildPackageReferences(projectElement);
+                return dotNetProject;
             }
+
+            dotNetProject.SetProjectProperties(projectElement);
+            dotNetProject.BuildProjectReferences(projectElement);
+            dotNetProject.BuildPackageReferences(projectElement);
 
             return dotNetProject;
         }
@@ -97,13 +121,11 @@ internal static class ProjectExtensions
 
         private void BuildPackageReferences(XElement projectElement)
         {
-            List<XElement> packageReferences =
-            [
-                .. projectElement
-                    .Descendants()
-                    .Where(element => element.Name.LocalName == PackageReferenceElement)
-                    .Where(element => ((string?)element.Attribute(IncludeAttribute)).IsAssigned())
-            ];
+            List<XElement> packageReferences = projectElement
+                .Descendants()
+                .Where(element => element.Name.LocalName == PackageReferenceElement)
+                .Where(element => ((string?)element.Attribute(IncludeAttribute)).IsAssigned())
+                .ToList();
 
             dotNetProject.PackageReferences.AddRange(packageReferences
                 .Select(element => (string)element.Attribute(IncludeAttribute)!));
@@ -115,23 +137,12 @@ internal static class ProjectExtensions
 
         public List<string> GetPackageReferencesFromReferencedProjects()
         {
-            return
-            [
-                .. dotNetProject
-                    .ReferencedProjects
-                    .Concat(dotNetProject.ReferencedSubProjects)
-                    .SelectMany(referencedProject => referencedProject.PackageReferences.Except(referencedProject.PrivatePackageReferences))
-                    .Distinct()
-            ];
-        }
-
-        public List<string> GetSubPackageReferences()
-        {
-            PackageReader packageReader = PackageReader.Read(dotNetProject.FileName);
-
-            dotNetProject.PackageReferencesMissing = !packageReader.IsAvailable && dotNetProject.PackageReferences.Any();
-
-            return packageReader.GetSubPackageReferences(dotNetProject.PackageReferences);
+            return dotNetProject
+                .ReferencedProjects
+                .Concat(dotNetProject.ReferencedSubProjects)
+                .SelectMany(referencedProject => referencedProject.PackageReferences.Except(referencedProject.PrivatePackageReferences))
+                .Distinct()
+                .ToList();
         }
 
         public IEnumerable<IDotNetProject> GetSubProjectReferences()
@@ -143,7 +154,7 @@ internal static class ProjectExtensions
                 AddSubProjectReferences(referencedSdkProject, subProjectReferences);
             }
 
-            return [.. subProjectReferences];
+            return subProjectReferences;
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Konfidence.Base;
 using Microsoft.Extensions.Configuration;
+using ToolClasses.ExtensionMethods;
 using ToolInterfaces;
 
 namespace ToolClasses;
@@ -20,9 +22,14 @@ public class ApplicationConfiguration
 
     public bool Help { get; }
 
+    public List<string> IgnoredArguments { get; }
+
     public ApplicationConfiguration(
-        IConfiguration configuration)
+        IConfiguration configuration,
+        string[] commandLineArguments)
     {
+        IgnoredArguments = commandLineArguments.GetIgnoredArguments();
+
         BasePath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(configuration.GetValue(nameof(Arguments.BasePath), Directory.GetCurrentDirectory())));
 
         AllProjects = configuration.GetValue(nameof(Arguments.AllProjects), false);
@@ -67,12 +74,9 @@ public class ApplicationConfiguration
 
         string solutionFile = $"{solutionName}{SolutionExtension}";
 
-        if (File.Exists(Path.Combine(BasePath, solutionFile)))
-        {
-            return solutionFile;
-        }
-
-        return $"{solutionName}{SolutionXmlExtension}";
+        return File.Exists(Path.Combine(BasePath, solutionFile))
+            ? solutionFile
+            : $"{solutionName}{SolutionXmlExtension}";
     }
 
     private static bool HasSolutionExtension(string solutionName)

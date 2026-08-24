@@ -360,11 +360,13 @@ public class ApplicationConfigurationTests
 
     private static TestContext CreateContext(params string[] args)
     {
+        string[] expandedArguments = args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments);
+
         IConfiguration configuration = new ConfigurationBuilder()
-            .AddCommandLine(args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments))
+            .AddCommandLine(expandedArguments)
             .Build();
 
-        return new TestContext(new ApplicationConfiguration(configuration));
+        return new TestContext(new ApplicationConfiguration(configuration, expandedArguments));
     }
 
     private sealed class TestContext

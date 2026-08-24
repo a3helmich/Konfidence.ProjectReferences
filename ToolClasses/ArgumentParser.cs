@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Konfidence.Base;
 using ToolClasses.ExtensionMethods;
 using ToolInterfaces;
@@ -11,6 +13,15 @@ public static class ArgumentParser
     {
         if (applicationConfiguration.Help)
         {
+            WriteUsage();
+
+            return false;
+        }
+
+        if (applicationConfiguration.IgnoredArguments.Any())
+        {
+            ReportIgnoredArguments(applicationConfiguration.IgnoredArguments);
+
             WriteUsage();
 
             return false;
@@ -67,6 +78,13 @@ public static class ArgumentParser
     private static string GetSolutionFileName(ApplicationConfiguration applicationConfiguration)
     {
         return Path.Combine(applicationConfiguration.BasePath, applicationConfiguration.SolutionFile);
+    }
+
+    private static void ReportIgnoredArguments(List<string> ignoredArguments)
+    {
+        string ignored = string.Join(", ", ignoredArguments.Select(argument => $"'{argument}'"));
+
+        $"ignored : {ignored} - arguments start with --, see --{Arguments.Help}".WriteLine();
     }
 
     private static void WriteHelpHint()

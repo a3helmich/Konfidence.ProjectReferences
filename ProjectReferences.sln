@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.4.33103.184
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12112.369 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectReferencesTool", "ProjectReferencesTool\ProjectReferencesTool.csproj", "{2B363992-96AE-4945-98CB-6A547831AE9D}"
 EndProject
@@ -29,6 +29,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{C8012A
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolClasses.UnitTest", "ToolClasses.UnitTest\ToolClasses.UnitTest.csproj", "{A34BFB5E-75B6-475E-8A9B-B8753942583C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".readme", ".readme", "{74D8C342-6213-4007-9B64-DDF64C000E4D}"
+	ProjectSection(SolutionItems) = preProject
+		readme\console-output.PNG = readme\console-output.PNG
+		readme\non-redundant-projects.PNG = readme\non-redundant-projects.PNG
+		readme\redundant-projects.PNG = readme\redundant-projects.PNG
+		readme\redundant-txt.PNG = readme\redundant-txt.PNG
+		readme\tool-classes.PNG = readme\tool-classes.PNG
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,3 +1,4 @@
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
 using ToolInterfaces;
@@ -109,6 +110,84 @@ public class CommandLineExtensionsTests
 
         // Assert
         CollectionAssert.AreEqual(new[] { "--BasePath", @"C:\Projects\X", "--AllProjects=true", "--Help=true", "--solution", "ProjectReferences" }, expanded);
+    }
+
+    [TestMethod]
+    public void GetIgnoredArguments_WithBareKeyAndValue_ReportsBoth()
+    {
+        // Arrange
+        string[] args = ["solution", "mysolution.sln"];
+
+        // Act
+        List<string> ignored = args.GetIgnoredArguments();
+
+        // Assert
+        CollectionAssert.AreEqual(new[] { "solution", "mysolution.sln" }, ignored);
+    }
+
+    [TestMethod]
+    public void GetIgnoredArguments_WithABareKeyValuePair_ReportsNothing()
+    {
+        // Arrange
+        string[] args = ["solution=mysolution.sln"];
+
+        // Act
+        List<string> ignored = args.GetIgnoredArguments();
+
+        // Assert
+        Assert.AreEqual(0, ignored.Count);
+    }
+
+    [TestMethod]
+    public void GetIgnoredArguments_WithAPrefixedArgumentAndValue_ReportsNothing()
+    {
+        // Arrange
+        string[] args = ["--solution", "mysolution.sln"];
+
+        // Act
+        List<string> ignored = args.GetIgnoredArguments();
+
+        // Assert
+        Assert.AreEqual(0, ignored.Count);
+    }
+
+    [TestMethod]
+    public void GetIgnoredArguments_WithAValueThatLooksLikeAnArgument_ReportsNothing()
+    {
+        // Arrange
+        string[] args = ["--BasePath", @"C:\Projects\solution"];
+
+        // Act
+        List<string> ignored = args.GetIgnoredArguments();
+
+        // Assert
+        Assert.AreEqual(0, ignored.Count);
+    }
+
+    [TestMethod]
+    public void GetIgnoredArguments_WithAStrayValueAfterAValidArgument_ReportsOnlyTheStrayOne()
+    {
+        // Arrange
+        string[] args = ["--Solution=mysolution.sln", "leftover"];
+
+        // Act
+        List<string> ignored = args.GetIgnoredArguments();
+
+        // Assert
+        CollectionAssert.AreEqual(new[] { "leftover" }, ignored);
+    }
+
+    [TestMethod]
+    public void GetIgnoredArguments_WithoutArguments_ReportsNothing()
+    {
+        // Arrange
+        string[] args = [];
+
+        // Act
+        List<string> ignored = args.GetIgnoredArguments();
+
+        // Assert
+        Assert.AreEqual(0, ignored.Count);
     }
 
     [TestMethod]

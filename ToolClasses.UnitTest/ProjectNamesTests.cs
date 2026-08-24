@@ -175,11 +175,13 @@ public class ProjectNamesTests
 
     private static TestContext CreateContext(params string[] args)
     {
+        string[] expandedArguments = args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments);
+
         IConfiguration configuration = new ConfigurationBuilder()
-            .AddCommandLine(args.ExpandSwitchArguments(CommandLineExtensions.SwitchArguments))
+            .AddCommandLine(expandedArguments)
             .Build();
 
-        ApplicationConfiguration applicationConfiguration = new(configuration);
+        ApplicationConfiguration applicationConfiguration = new(configuration, expandedArguments);
 
         SolutionReader solutionReader = new(applicationConfiguration);
 
