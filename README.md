@@ -21,27 +21,27 @@ The project references tool is a console application which scans your .cs projec
  
 	If this is how the references in our project looks like (take note of the highlighted references).
 
-	![Redundant projects example](./readme/redundant-projects.PNG)
+	![Redundant projects example](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/redundant-projects.PNG)
  
 	And this is the project, containing a project which should not need to be referenced in our project, because of the implicit reference. 
 
-	![](./readme/tool-classes.PNG)  
+	![](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/tool-classes.PNG)  
   
 	You would want to remove the reference to the ToolInterfaces project from our project, because it is already refrenced by, in this case, the ToolClasses project. 
 	
 	Like this:
 
-	![](./readme/non-redundant-projects.PNG)
+	![](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/non-redundant-projects.PNG)
 
 	Easy to find when you have like 5 projects in your solution. But a bit harder with something like a 100 projects. 
 
 - Running the tool would give:
 
-	![](./readme/console-output.PNG)
+	![](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/console-output.PNG)
 
 - Also creating the file 'redundant.txt':
 
-	![](./readme/redundant-txt.PNG)
+	![](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/redundant-txt.PNG)
 
 ### How to run
 - project-references : scans the solution named after your current folder, so 'c:\projects\myapp' uses 'myapp.sln', or 'myapp.slnx' when that is the one present.
