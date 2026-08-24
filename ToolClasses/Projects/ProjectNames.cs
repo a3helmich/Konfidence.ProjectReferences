@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Konfidence.Base;
-using ToolClasses.Solutions;
+using ToolClasses.Readers;
 
 namespace ToolClasses.Projects;
 
@@ -11,17 +11,13 @@ public class ProjectNames
 {
     private readonly SolutionReader _solutionReader;
 
-    private readonly ProjectReader _projectReader;
-
     private readonly ApplicationConfiguration _applicationConfiguration;
 
     public ProjectNames(
         SolutionReader solutionReader,
-        ProjectReader projectReader,
         ApplicationConfiguration applicationConfiguration)
     {
         _solutionReader = solutionReader;
-        _projectReader = projectReader;
         _applicationConfiguration = applicationConfiguration;
     }
 

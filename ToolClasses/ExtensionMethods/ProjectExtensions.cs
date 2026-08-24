@@ -6,7 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using JetBrains.Annotations;
 using Konfidence.Base;
-using ToolClasses.Packages;
+using ToolClasses.Readers;
 using ToolInterfaces;
 
 namespace ToolClasses.ExtensionMethods;
@@ -127,11 +127,11 @@ internal static class ProjectExtensions
 
         public List<string> GetSubPackageReferences()
         {
-            PackageGraph packageGraph = PackageGraph.Read(dotNetProject.FileName);
+            PackageReader packageReader = PackageReader.Read(dotNetProject.FileName);
 
-            dotNetProject.PackageGraphMissing = !packageGraph.IsAvailable && dotNetProject.PackageReferences.Any();
+            dotNetProject.PackageReferencesMissing = !packageReader.IsAvailable && dotNetProject.PackageReferences.Any();
 
-            return packageGraph.GetSubPackageReferences(dotNetProject.PackageReferences);
+            return packageReader.GetSubPackageReferences(dotNetProject.PackageReferences);
         }
 
         public IEnumerable<IDotNetProject> GetSubProjectReferences()

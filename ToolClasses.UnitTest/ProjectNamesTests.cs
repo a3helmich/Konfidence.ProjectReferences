@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
-using ToolClasses.Solutions;
+using ToolClasses.Readers;
 
 namespace ToolClasses.UnitTest;
 
@@ -183,9 +183,7 @@ public class ProjectNamesTests
 
         SolutionReader solutionReader = new(applicationConfiguration);
 
-        ProjectReader projectReader = new();
-
-        return new TestContext(new ProjectNames(solutionReader, projectReader, applicationConfiguration));
+        return new TestContext(new ProjectNames(solutionReader, applicationConfiguration));
     }
 
     private sealed class TestContext

@@ -17,7 +17,7 @@ internal class DotNetProject : IDotNetProject
 
     public List<string> ReferencedSubPackages { get; set; } = [];
 
-    public bool PackageGraphMissing { get; set; } = false;
+    public bool PackageReferencesMissing { get; set; } = false;
 
     public List<IDotNetProject> ReferencedProjects { get; set; } = [];
 

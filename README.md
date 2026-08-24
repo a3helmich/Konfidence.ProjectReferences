@@ -4,7 +4,7 @@ Report redundant project/package references
 
 ## ProjectReferencesTool
 
-The project references tool is a console application which scans your .cs projects for redundant project/package references — the ones a project already gets through another project it references.
+The project references tool is a console application which scans your .cs projects for redundant project/package references — the ones a project already gets another way, either through a project it references or through another package it references.
 
 ### Using the tool
 - package: The project references tool is published as a package on [nuget.org - Konfidence.Project-References](https://www.nuget.org/packages/Konfidence.Project-References).
@@ -12,7 +12,8 @@ The project references tool is a console application which scans your .cs projec
 - basic run: in a console go to your solution folder and run 'project-references'. It scans the solution named after that folder, use '--AllProjects' to scan every project below it instead.
 - result 1: console displays the redundant project/package references within the scanned projects. Project references are listed by their .csproj path, package references by name with a .nupkg extension.
 - result 2: creates a 'redundant.txt' file, which contains the results displayed in the console.
-- actions: manually update the references in your projects and remove the redundant ones. A redundant package reference is worth a second look before removing it — a deliberately pinned version, or 'PrivateAssets="all"' on the project that brings it, are both reasons to keep one.
+- restore: packages a project gets through *another package* are read from the restore output, so those are only checked for projects that have been restored. The tool says how many projects it had to skip. Everything else — project references, and packages brought by a referenced project — needs nothing but the source files.
+- actions: manually update the references in your projects and remove the redundant ones. A redundant package reference is worth a second look first: a version pinned on purpose is a reason to keep one. Packages the other project declares with 'PrivateAssets=all' are not reported, because those do not reach you.
 - where: because it is a dotnetcore console application, it runs on both windows and linux.
 - for whom: all dotnet c# developers creating solutions containing large amounts of projects.
  
@@ -39,7 +40,9 @@ The project references tool is a console application which scans your .cs projec
 
 	![](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/console-output.PNG)
 
-	A package reference works the same way. If 'ToolClasses' references a package and our project references both 'ToolClasses' and that same package, our own package reference adds nothing — 'ToolClasses' already brings it.
+	A package reference works the same way. If 'ToolClasses' references a package and our project references both 'ToolClasses' and that same package, our own package reference adds nothing — 'ToolClasses' already brings it. The same holds between packages: if we reference a package which itself depends on a second package, referencing that second one directly adds nothing either.
+
+	Two things stop a package being reported. A package the other project declares with 'PrivateAssets=all' does not flow to us, so ours is not redundant. And a project which has not been restored has no package dependency information, so packages brought by other packages are not checked for it.
 
 - Also creating the file 'redundant.txt':
 

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
 using ToolClasses.Projects;
-using ToolClasses.Solutions;
+using ToolClasses.Readers;
 
 namespace ToolClasses.UnitTest;
 
@@ -535,7 +535,7 @@ public class ProjectReferencesEngineTests
 
         SolutionReader solutionReader = new(applicationConfiguration);
 
-        ProjectNames projectNames = new(solutionReader, projectReader, applicationConfiguration);
+        ProjectNames projectNames = new(solutionReader, applicationConfiguration);
 
         return new TestContext(new ProjectReferencesEngine(applicationConfiguration, projectReader, projectNames));
     }

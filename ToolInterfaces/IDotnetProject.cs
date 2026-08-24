@@ -16,7 +16,7 @@ public interface IDotNetProject
 
     List<string> ReferencedSubPackages { get; }
 
-    bool PackageGraphMissing { get; set; }
+    bool PackageReferencesMissing { get; set; }
 
     List<IDotNetProject> ReferencedProjects { get; }
 
