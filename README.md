@@ -10,7 +10,7 @@ The project references tool is a console application which scans your .cs projec
 - package: The project references tool is published as a package on [nuget.org - Konfidence.Project-References](https://www.nuget.org/packages/Konfidence.Project-References).
 - install: run 'dotnet tool install --global Konfidence.Project-References'
 - basic run: in a console go to your solution folder and run 'project-references'. It scans the solution named after that folder, use '--AllProjects' to scan every project below it instead.
-- result 1: console displays the redundant project/package references within the scanned projects. Project references are listed by their .csproj path, package references by name with a .nupkg extension.
+- result 1: console displays the redundant project/package references within the scanned projects, grouped per project. A project reference is marked with a '-' and listed by its .csproj path, a package reference with a '+' and listed by name with a .nupkg extension.
 - result 2: creates a 'redundant.txt' file, which contains the results displayed in the console.
 - restore: packages a project gets through *another package* are read from the restore output, so those are only checked for projects that have been restored. The tool says how many projects it had to skip. Everything else — project references, and packages brought by a referenced project — needs nothing but the source files.
 - actions: manually update the references in your projects and remove the redundant ones. A redundant package reference is worth a second look first: a version pinned on purpose is a reason to keep one. Packages the other project declares with 'PrivateAssets=all' are not reported, because those do not reach you.
@@ -43,6 +43,15 @@ The project references tool is a console application which scans your .cs projec
 	A package reference works the same way. If 'ToolClasses' references a package and our project references both 'ToolClasses' and that same package, our own package reference adds nothing — 'ToolClasses' already brings it. The same holds between packages: if we reference a package which itself depends on a second package, referencing that second one directly adds nothing either.
 
 	Two things stop a package being reported. A package the other project declares with 'PrivateAssets=all' does not flow to us, so ours is not redundant. And a project which has not been restored has no package dependency information, so packages brought by other packages are not checked for it.
+
+	A report looks like this:
+
+```
+Redundant project/package references:
+\Test\Konfidence.BaseClasses.UnitTest\Konfidence.BaseClasses.UnitTest.csproj
+     - \Konfidence.BaseClasses\Konfidence.BaseClasses.csproj
+     + Microsoft.NET.Test.Sdk.nupkg
+```
 
 - Also creating the file 'redundant.txt':
 

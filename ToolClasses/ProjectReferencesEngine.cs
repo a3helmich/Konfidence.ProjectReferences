@@ -93,7 +93,7 @@ public class ProjectReferencesEngine
 
             foreach (string redundantPackageReference in projectWithRedundantReferences.RedundantPackageReferences)
             {
-                line = $"{tab} - {redundantPackageReference}{PackageExtension}".WriteLine();
+                line = $"{tab} + {redundantPackageReference}{PackageExtension}".WriteLine();
 
                 await sw.WriteLineAsync(line);
             }
