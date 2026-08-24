@@ -23,16 +23,20 @@ public class RedundancyReport
         _applicationConfiguration = applicationConfiguration;
     }
 
-    public async Task Write(List<IDotNetProject> projectsWithRedundantReferences)
+    public async Task Write(List<IDotNetProject> projectsWithRedundantReferences, int projectsWithoutPackageReferences)
     {
         if (!projectsWithRedundantReferences.Any())
         {
+            WriteMissingPackageReferences(projectsWithoutPackageReferences);
+
             "No redundant project/package references found.".WriteLine();
 
             return;
         }
 
         await using StreamWriter reportFile = new(ReportFileName);
+
+        await WriteMissingPackageReferences(reportFile, projectsWithoutPackageReferences);
 
         await WriteLine(reportFile, $"Redundant project/package references{GetSolutionText()}");
 
@@ -57,6 +61,27 @@ public class RedundancyReport
         {
             await WriteLine(reportFile, $"{Tab} + {redundantPackageReference}{PackageExtension}");
         }
+    }
+
+    private static void WriteMissingPackageReferences(int projectsWithoutPackageReferences)
+    {
+        if (projectsWithoutPackageReferences > 0)
+        {
+            GetMissingPackageReferencesNote(projectsWithoutPackageReferences).WriteLine();
+        }
+    }
+
+    private static async Task WriteMissingPackageReferences(StreamWriter reportFile, int projectsWithoutPackageReferences)
+    {
+        if (projectsWithoutPackageReferences > 0)
+        {
+            await WriteLine(reportFile, GetMissingPackageReferencesNote(projectsWithoutPackageReferences));
+        }
+    }
+
+    private static string GetMissingPackageReferencesNote(int projectsWithoutPackageReferences)
+    {
+        return $"note : {projectsWithoutPackageReferences} project(s) have no restore output, package dependencies were not checked for them";
     }
 
     private static async Task WriteLine(StreamWriter reportFile, string line)
