@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ToolClasses.ExtensionMethods;
@@ -47,9 +47,7 @@ public class ProjectReferencesEngine
             .ExtendProjectsWithAllRedundantProjectReferences()
             .ExtendProjectsWithAllRedundantPackageReferences();
 
-        ReportMissingPackageReferences();
-
-        await _redundancyReport.Write(GetProjectsWithRedundantReferences());
+        await _redundancyReport.Write(GetProjectsWithRedundantReferences(), CountProjectsWithoutPackageReferences());
     }
 
     private List<IDotNetProject> GetProjectsWithRedundantReferences()
@@ -60,13 +58,8 @@ public class ProjectReferencesEngine
             .ToList();
     }
 
-    private void ReportMissingPackageReferences()
+    private int CountProjectsWithoutPackageReferences()
     {
-        int projectsWithoutPackageReferences = _projectReader.SdkProjects.Count(sdkProject => sdkProject.PackageReferencesMissing);
-
-        if (projectsWithoutPackageReferences > 0)
-        {
-            $"note : {projectsWithoutPackageReferences} project(s) have no restore output, package dependencies were not checked for them".WriteLine();
-        }
+        return _projectReader.SdkProjects.Count(sdkProject => sdkProject.PackageReferencesMissing);
     }
 }

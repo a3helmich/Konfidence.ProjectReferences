@@ -366,6 +366,26 @@ public class ProjectReferencesEngineTests
         StringAssert.Contains(redundant, "Inner.nupkg");
     }
 
+    [TestMethod]
+    public async Task Execute_WithProjectsMissingRestoreOutput_PutsTheNoteInTheReportFile()
+    {
+        // Arrange
+        WriteProject("C", [], "Serilog");
+        WriteProject("B", ["C"]);
+        WriteProject("A", ["B"], "Serilog");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, "no restore output");
+        StringAssert.StartsWith(redundant, "note :");
+    }
+
     private string ReadRedundantFile()
     {
         string redundantFile = Path.Combine(_outputPath, RedundantFileName);
