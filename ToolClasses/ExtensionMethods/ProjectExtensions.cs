@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using JetBrains.Annotations;
 using Konfidence.Base;
+using ToolClasses.Packages;
 using ToolInterfaces;
 
 namespace ToolClasses.ExtensionMethods;
@@ -19,6 +21,32 @@ internal static class ProjectExtensions
     private const string ProjectReferenceElement = "ProjectReference";
 
     private const string PackageReferenceElement = "PackageReference";
+
+    private const string PrivateAssetsName = "PrivateAssets";
+
+    private const string AllAssets = "all";
+
+    private static bool KeepsAssetsPrivate(XElement packageReference)
+    {
+        string privateAssets = (string?)packageReference.Attribute(PrivateAssetsName)
+                               ?? packageReference
+                                   .Elements()
+                                   .FirstOrDefault(element => element.Name.LocalName == PrivateAssetsName)?.Value
+                               ?? string.Empty;
+
+        return privateAssets.Trim().Equals(AllAssets, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void AddSubProjectReferences(IDotNetProject project, HashSet<IDotNetProject> subProjectReferences)
+    {
+        foreach (IDotNetProject referencedProject in project.ReferencedProjects)
+        {
+            if (subProjectReferences.Add(referencedProject))
+            {
+                AddSubProjectReferences(referencedProject, subProjectReferences);
+            }
+        }
+    }
 
     extension(IDotNetProject dotNetProject)
     {
@@ -69,12 +97,20 @@ internal static class ProjectExtensions
 
         private void BuildPackageReferences(XElement projectElement)
         {
-            dotNetProject.PackageReferences.AddRange(projectElement
-                .Descendants()
-                .Where(element => element.Name.LocalName == PackageReferenceElement)
-                .Select(element => (string?)element.Attribute(IncludeAttribute))
-                .Where(include => include.IsAssigned())
-                .Select(include => include!));
+            List<XElement> packageReferences =
+            [
+                .. projectElement
+                    .Descendants()
+                    .Where(element => element.Name.LocalName == PackageReferenceElement)
+                    .Where(element => ((string?)element.Attribute(IncludeAttribute)).IsAssigned())
+            ];
+
+            dotNetProject.PackageReferences.AddRange(packageReferences
+                .Select(element => (string)element.Attribute(IncludeAttribute)!));
+
+            dotNetProject.PrivatePackageReferences.AddRange(packageReferences
+                .Where(KeepsAssetsPrivate)
+                .Select(element => (string)element.Attribute(IncludeAttribute)!));
         }
 
         public List<string> GetPackageReferencesFromReferencedProjects()
@@ -84,30 +120,30 @@ internal static class ProjectExtensions
                 .. dotNetProject
                     .ReferencedProjects
                     .Concat(dotNetProject.ReferencedSubProjects)
-                    .SelectMany(referencedProject => referencedProject.PackageReferences)
+                    .SelectMany(referencedProject => referencedProject.PackageReferences.Except(referencedProject.PrivatePackageReferences))
                     .Distinct()
             ];
         }
 
+        public List<string> GetSubPackageReferences()
+        {
+            PackageGraph packageGraph = PackageGraph.Read(dotNetProject.FileName);
+
+            dotNetProject.PackageGraphMissing = !packageGraph.IsAvailable && dotNetProject.PackageReferences.Any();
+
+            return packageGraph.GetSubPackageReferences(dotNetProject.PackageReferences);
+        }
+
         public IEnumerable<IDotNetProject> GetSubProjectReferences()
         {
-            List<IDotNetProject> subProjectReferences = [];
+            HashSet<IDotNetProject> subProjectReferences = [];
 
             foreach (IDotNetProject referencedSdkProject in dotNetProject.ReferencedProjects)
             {
-                subProjectReferences.AddRange(referencedSdkProject.ReferencedProjects);
-
-                if (referencedSdkProject.SubProjectReferencesResolved)
-                {
-                    continue;
-                }
-
-                subProjectReferences.AddRange(referencedSdkProject.GetSubProjectReferences());
+                AddSubProjectReferences(referencedSdkProject, subProjectReferences);
             }
 
-            dotNetProject.SubProjectReferencesResolved = true;
-
-            return subProjectReferences.Distinct().ToList();
+            return [.. subProjectReferences];
         }
     }
 }

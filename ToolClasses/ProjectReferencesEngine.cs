@@ -44,6 +44,7 @@ public class ProjectReferencesEngine
             .Execute(projectNames)
             .ExtendProjectsWithProjectReferences()
             .ExtendProjectsWithAllSubProjectReferences()
+            .ExtendProjectsWithAllSubPackageReferences()
             .ExtendProjectsWithAllRedundantProjectReferences()
             .ExtendProjectsWithAllRedundantPackageReferences();
 
@@ -51,6 +52,13 @@ public class ProjectReferencesEngine
             .SdkProjects
             .Where(x => x.RedundantReferencedProjects.Any() || x.RedundantPackageReferences.Any())
             .ToList();
+
+        int projectsWithoutPackageGraph = _projectReader.SdkProjects.Count(x => x.PackageGraphMissing);
+
+        if (projectsWithoutPackageGraph > 0)
+        {
+            $"note : {projectsWithoutPackageGraph} project(s) have no restore output, package dependencies were not checked for them".WriteLine();
+        }
 
         string tab = new(' ', 4);
 
