@@ -52,5 +52,21 @@ internal static class ProjectReaderExtensions
 
             return projectReader;
         }
+
+        public ProjectReader ExtendProjectsWithAllRedundantPackageReferences()
+        {
+            foreach (IDotNetProject sdkProject in projectReader.SdkProjects)
+            {
+                List<string> packageReferencesFromReferencedProjects = sdkProject.GetPackageReferencesFromReferencedProjects();
+
+                IEnumerable<string> redundantPackageReferences = sdkProject
+                    .PackageReferences
+                    .Where(packageReference => packageReferencesFromReferencedProjects.Any(referencedPackage => referencedPackage == packageReference));
+
+                sdkProject.RedundantPackageReferences.AddRange(redundantPackageReferences);
+            }
+
+            return projectReader;
+        }
     }
 }

@@ -13,11 +13,15 @@ internal class DotNetProject : IDotNetProject
 
     public List<string> ProjectReferences { get; set; } = [];
 
+    public List<string> PackageReferences { get; set; } = [];
+
     public List<IDotNetProject> ReferencedProjects { get; set; } = [];
 
     public List<IDotNetProject> ReferencedSubProjects { get; set; } = [];
 
     public List<IDotNetProject> RedundantReferencedProjects { get; set; } = [];
+
+    public List<string> RedundantPackageReferences { get; set; } = [];
 
     public DotNetProject(string projectName)
     {

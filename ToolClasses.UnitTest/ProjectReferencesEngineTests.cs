@@ -166,6 +166,61 @@ public class ProjectReferencesEngineTests
         StringAssert.Contains(redundant, Path.Combine("C", "C.csproj"));
     }
 
+    [TestMethod]
+    public async Task Execute_WithAPackageAlreadyBroughtByAReferencedProject_ReportsItAsRedundant()
+    {
+        // Arrange
+        WriteProject("C", [], "Serilog");
+        WriteProject("B", ["C"]);
+        WriteProject("A", ["B"], "Serilog");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, "Serilog");
+    }
+
+    [TestMethod]
+    public async Task Execute_WithAPackageNoReferencedProjectBrings_DoesNotReportIt()
+    {
+        // Arrange
+        WriteProject("C", []);
+        WriteProject("B", ["C"]);
+        WriteProject("A", ["B"], "Serilog");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        AssertRedundantFileWasNotWritten();
+    }
+
+    [TestMethod]
+    public async Task Execute_WithAPackageBroughtOnlyThroughAnIndirectProject_ReportsItAsRedundant()
+    {
+        // Arrange
+        WriteProject("C", [], "Newtonsoft.Json");
+        WriteProject("B", ["C"]);
+        WriteProject("A", ["B"], "Newtonsoft.Json");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, "Newtonsoft.Json");
+    }
+
     private string ReadRedundantFile()
     {
         string redundantFile = Path.Combine(_outputPath, RedundantFileName);
@@ -210,6 +265,33 @@ public class ProjectReferencesEngineTests
         foreach (string referencedProjectName in referencedProjectNames)
         {
             references += $@"    <ProjectReference Include=""..\{referencedProjectName}\{referencedProjectName}.csproj"" />{Environment.NewLine}";
+        }
+
+        string project = $@"<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+{references}  </ItemGroup>
+</Project>";
+
+        File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
+    }
+
+    private void WriteProject(string projectName, string[] referencedProjectNames, params string[] packageNames)
+    {
+        string projectFolder = Path.Combine(_basePath, projectName);
+
+        Directory.CreateDirectory(projectFolder);
+
+        string references = string.Empty;
+
+        foreach (string referencedProjectName in referencedProjectNames)
+        {
+            references += $@"    <ProjectReference Include=""..\{referencedProjectName}\{referencedProjectName}.csproj"" />{Environment.NewLine}";
+        }
+
+        foreach (string packageName in packageNames)
+        {
+            references += $@"    <PackageReference Include=""{packageName}"" Version=""1.0.0"" />{Environment.NewLine}";
         }
 
         string project = $@"<Project Sdk=""Microsoft.NET.Sdk"">
