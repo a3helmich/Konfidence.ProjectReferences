@@ -183,7 +183,7 @@ public class ProjectNamesTests
 
         SolutionReader solutionReader = new(applicationConfiguration);
 
-        ProjectReader projectReader = new(applicationConfiguration);
+        ProjectReader projectReader = new();
 
         return new TestContext(new ProjectNames(solutionReader, projectReader, applicationConfiguration));
     }

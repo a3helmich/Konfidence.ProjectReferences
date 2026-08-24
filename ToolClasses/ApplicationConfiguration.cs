@@ -23,7 +23,7 @@ public class ApplicationConfiguration
     public ApplicationConfiguration(
         IConfiguration configuration)
     {
-        BasePath = Path.TrimEndingDirectorySeparator(configuration.GetValue(nameof(Arguments.BasePath), Directory.GetCurrentDirectory()));
+        BasePath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(configuration.GetValue(nameof(Arguments.BasePath), Directory.GetCurrentDirectory())));
 
         AllProjects = configuration.GetValue(nameof(Arguments.AllProjects), false);
 
