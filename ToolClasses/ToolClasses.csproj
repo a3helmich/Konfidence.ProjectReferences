@@ -10,4 +10,8 @@
 		<ProjectReference Include="..\ToolInterfaces\ToolInterfaces.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="ToolClasses.UnitTest" />
+	</ItemGroup>
+
 </Project>

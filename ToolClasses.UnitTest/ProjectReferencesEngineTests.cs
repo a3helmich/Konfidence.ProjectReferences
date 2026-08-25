@@ -387,6 +387,38 @@ public class ProjectReferencesEngineTests
     }
 
     [TestMethod]
+    public async Task Execute_WithANonSdkProject_PutsTheNoteInTheReportFile()
+    {
+        // Arrange
+        WriteLegacyProject("Legacy");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        StringAssert.Contains(redundant, "not SDK style");
+    }
+
+    [TestMethod]
+    public async Task Execute_WithoutANonSdkProject_LeavesTheNoteOutOfTheReportFile()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        string redundant = ReadRedundantFile();
+
+        Assert.IsFalse(redundant.Contains("not SDK style", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [TestMethod]
     public async Task Execute_WithNothingRedundantAndAReportFileFromAnEarlierRun_RemovesTheReportFile()
     {
         // Arrange
@@ -397,6 +429,19 @@ public class ProjectReferencesEngineTests
         File.WriteAllText(Path.Combine(_outputPath, RedundantFileName), "findings from an earlier run");
 
         TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        AssertRedundantFileWasNotWritten();
+    }
+
+    [TestMethod]
+    public async Task Execute_WithAnUnreadableArgument_ScansNothingAndWritesNoReportFile()
+    {
+        // Arrange
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects", "solution", "mysolution.sln");
 
         // Act
         await context.ProjectReferencesEngine.Execute();
@@ -436,6 +481,20 @@ public class ProjectReferencesEngineTests
         {
             Directory.Delete(folder, recursive: true);
         }
+    }
+
+    private void WriteLegacyProject(string projectName)
+    {
+        string projectFolder = Path.Combine(_basePath, projectName);
+
+        Directory.CreateDirectory(projectFolder);
+
+        string project = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<Project ToolsVersion=""15.0"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
+  <PropertyGroup><TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion></PropertyGroup>
+</Project>";
+
+        File.WriteAllText(Path.Combine(projectFolder, $"{projectName}.csproj"), project);
     }
 
     private void WriteProject(string projectName, params string[] referencedProjectNames)

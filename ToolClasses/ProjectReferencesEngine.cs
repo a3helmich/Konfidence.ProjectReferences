@@ -47,7 +47,7 @@ public class ProjectReferencesEngine
             .ExtendProjectsWithAllRedundantProjectReferences()
             .ExtendProjectsWithAllRedundantPackageReferences();
 
-        await _redundancyReport.Write(GetProjectsWithRedundantReferences(), CountProjectsWithoutPackageReferences());
+        await _redundancyReport.Write(GetProjectsWithRedundantReferences(), CountProjectsWithoutPackageReferences(), CountNonSdkProjects());
     }
 
     private List<IDotNetProject> GetProjectsWithRedundantReferences()
@@ -61,5 +61,10 @@ public class ProjectReferencesEngine
     private int CountProjectsWithoutPackageReferences()
     {
         return _projectReader.SdkProjects.Count(sdkProject => sdkProject.PackageReferencesMissing);
+    }
+
+    private int CountNonSdkProjects()
+    {
+        return _projectReader.NonSdkProjects.Count;
     }
 }

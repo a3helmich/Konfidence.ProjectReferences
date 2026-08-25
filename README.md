@@ -14,7 +14,8 @@ The project references tool is a console application which scans your .cs projec
 - result 2: creates a 'redundant.txt' file, which contains the results displayed in the console.
 - result 3: when nothing is redundant, a 'redundant.txt' left by an earlier run is removed, so the file never claims findings you have already cleaned up.
 - restore: packages a project gets through *another package* are read from the restore output, so those are only checked for projects that have been restored. The tool says how many projects it had to skip, on the console and as the first line of 'redundant.txt'. Everything else — project references, and packages brought by a referenced project — needs nothing but the source files.
-- actions: manually update the references in your projects and remove the redundant ones. A redundant package reference is worth a second look first: a version pinned on purpose is a reason to keep one. Packages the other project declares with 'PrivateAssets=all' are not reported, because those do not reach you.
+- actions: manually update the references in your projects and remove the redundant ones. A redundant package reference is worth a second look first: a version pinned on purpose is a reason to keep one. Packages the other project declares with 'PrivateAssets=all' are not reported, because those do not reach you, and neither are packages which reach you for runtime only. A project targeting several frameworks is judged on all of them at once, so nothing is reported which one of them still needs.
+- projects: SDK style projects only, the ones starting with '<Project Sdk="...">'. Old format projects, the ones with a 'packages.config' next to them, are skipped. The tool says how many it skipped, on the console and as a note in 'redundant.txt', so a clean report never quietly means it read nothing.
 - where: because it is a dotnetcore console application, it runs on both windows and linux.
 - for whom: all dotnet c# developers creating solutions containing large amounts of projects.
  
@@ -47,7 +48,9 @@ The project references tool is a console application which scans your .cs projec
 
 	A package reference works the same way. If 'ToolClasses' references a package and our project references both 'ToolClasses' and that same package, our own package reference adds nothing — 'ToolClasses' already brings it. The same holds between packages: if we reference a package which itself depends on a second package, referencing that second one directly adds nothing either.
 
-	Two things stop a package being reported. A package the other project declares with 'PrivateAssets=all' does not flow to us, so ours is not redundant. And a project which has not been restored has no package dependency information, so packages brought by other packages are not checked for it.
+	Three things stop a package being reported. A package the other project declares with 'PrivateAssets=all' does not flow to us, so ours is not redundant. A package which passes another one on for runtime only — declared in its own nuspec as 'exclude="Compile"' — hands us the dll but no compile time reference, so our own reference is the only thing letting us write code against it. And a project which has not been restored has no package dependency information, so packages brought by other packages are not checked for it.
+
+	A project with more than one target framework is judged on all of them together. A package hands out different dependencies per framework, often a polyfill the older framework needs and the newer one already has built in. So a package is only reported when every framework of the project gets it another way: a reference 'net10.0' could do without may still be the only thing holding up 'netstandard2.0'.
 
 - Also creating the file 'redundant.txt':
 

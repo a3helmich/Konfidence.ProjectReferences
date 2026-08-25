@@ -10,6 +10,8 @@ public class ProjectReader
 {
     public List<IDotNetProject> SdkProjects { get; private set; } = [];
 
+    public List<IDotNetProject> NonSdkProjects { get; private set; } = [];
+
     public Dictionary<string, IDotNetProject> ProjectFileNameLookup { get; private set; } = [];
 
     public ProjectReader Execute(List<string> projectFileNames)
@@ -23,6 +25,10 @@ public class ProjectReader
 
         SdkProjects = allProjects
             .Where(x => x.IsSdkProject)
+            .ToList();
+
+        NonSdkProjects = allProjects
+            .Where(x => !x.IsSdkProject)
             .ToList();
 
         return this;

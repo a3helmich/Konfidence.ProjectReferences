@@ -24,11 +24,13 @@ public class RedundancyReport
         _applicationConfiguration = applicationConfiguration;
     }
 
-    public async Task Write(List<IDotNetProject> projectsWithRedundantReferences, int projectsWithoutPackageReferences)
+    public async Task Write(List<IDotNetProject> projectsWithRedundantReferences, int projectsWithoutPackageReferences, int nonSdkProjects)
     {
+        List<string> notes = GetNotes(projectsWithoutPackageReferences, nonSdkProjects);
+
         if (!projectsWithRedundantReferences.Any())
         {
-            WriteMissingPackageReferences(projectsWithoutPackageReferences);
+            WriteNotes(notes);
 
             "No redundant project/package references found.".WriteLine();
 
@@ -39,7 +41,7 @@ public class RedundancyReport
 
         await using StreamWriter reportFile = new(ReportFileName);
 
-        await WriteMissingPackageReferences(reportFile, projectsWithoutPackageReferences);
+        await WriteNotes(reportFile, notes);
 
         await WriteLine(reportFile, $"Redundant project/package references{GetSolutionText()}");
 
@@ -88,25 +90,37 @@ public class RedundancyReport
         $"removed => '{ReportFileName}'".WriteLine();
     }
 
-    private static void WriteMissingPackageReferences(int projectsWithoutPackageReferences)
+    private static List<string> GetNotes(int projectsWithoutPackageReferences, int nonSdkProjects)
     {
+        List<string> notes = [];
+
         if (projectsWithoutPackageReferences > 0)
         {
-            GetMissingPackageReferencesNote(projectsWithoutPackageReferences).WriteLine();
+            notes.Add($"note : {projectsWithoutPackageReferences} project(s) have no restore output, package dependencies were not checked for them");
+        }
+
+        if (nonSdkProjects > 0)
+        {
+            notes.Add($"note : {nonSdkProjects} project(s) are not SDK style and were skipped");
+        }
+
+        return notes;
+    }
+
+    private static void WriteNotes(List<string> notes)
+    {
+        foreach (string note in notes)
+        {
+            note.WriteLine();
         }
     }
 
-    private static async Task WriteMissingPackageReferences(StreamWriter reportFile, int projectsWithoutPackageReferences)
+    private static async Task WriteNotes(StreamWriter reportFile, List<string> notes)
     {
-        if (projectsWithoutPackageReferences > 0)
+        foreach (string note in notes)
         {
-            await WriteLine(reportFile, GetMissingPackageReferencesNote(projectsWithoutPackageReferences));
+            await WriteLine(reportFile, note);
         }
-    }
-
-    private static string GetMissingPackageReferencesNote(int projectsWithoutPackageReferences)
-    {
-        return $"note : {projectsWithoutPackageReferences} project(s) have no restore output, package dependencies were not checked for them";
     }
 
     private static async Task WriteLine(StreamWriter reportFile, string line)
