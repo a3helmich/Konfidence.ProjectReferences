@@ -386,6 +386,25 @@ public class ProjectReferencesEngineTests
         StringAssert.StartsWith(redundant, "note :");
     }
 
+    [TestMethod]
+    public async Task Execute_WithNothingRedundantAndAReportFileFromAnEarlierRun_RemovesTheReportFile()
+    {
+        // Arrange
+        WriteProject("A", []);
+        WriteProject("B", []);
+        WriteProject("C", []);
+
+        File.WriteAllText(Path.Combine(_outputPath, RedundantFileName), "findings from an earlier run");
+
+        TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
+
+        // Act
+        await context.ProjectReferencesEngine.Execute();
+
+        // Assert
+        AssertRedundantFileWasNotWritten();
+    }
+
     private string ReadRedundantFile()
     {
         string redundantFile = Path.Combine(_outputPath, RedundantFileName);
