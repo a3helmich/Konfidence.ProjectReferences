@@ -49,15 +49,6 @@ The project references tool is a console application which scans your .cs projec
 
 	Two things stop a package being reported. A package the other project declares with 'PrivateAssets=all' does not flow to us, so ours is not redundant. And a project which has not been restored has no package dependency information, so packages brought by other packages are not checked for it.
 
-	A report looks like this:
-
-	```
-	Redundant project/package references:
-	\Test\Konfidence.BaseClasses.UnitTest\Konfidence.BaseClasses.UnitTest.csproj
-	     - \Konfidence.BaseClasses\Konfidence.BaseClasses.csproj
-	     + Microsoft.NET.Test.Sdk.nupkg
-	```
-
 - Also creating the file 'redundant.txt':
 
 	![The generated redundant.txt](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/redundant-txt.PNG)
