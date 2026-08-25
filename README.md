@@ -12,7 +12,8 @@ The project references tool is a console application which scans your .cs projec
 - basic run: in a console go to your solution folder and run 'project-references'. It scans the solution named after that folder, use '--AllProjects' to scan every project below it instead.
 - result 1: console displays the redundant project/package references within the scanned projects, grouped per project. A project reference is marked with a '-' and listed by its .csproj path, a package reference with a '+' and listed by name with a .nupkg extension.
 - result 2: creates a 'redundant.txt' file, which contains the results displayed in the console.
-- restore: packages a project gets through *another package* are read from the restore output, so those are only checked for projects that have been restored. The tool says how many projects it had to skip. Everything else — project references, and packages brought by a referenced project — needs nothing but the source files.
+- result 3: when nothing is redundant, a 'redundant.txt' left by an earlier run is removed, so the file never claims findings you have already cleaned up.
+- restore: packages a project gets through *another package* are read from the restore output, so those are only checked for projects that have been restored. The tool says how many projects it had to skip, on the console and as the first line of 'redundant.txt'. Everything else — project references, and packages brought by a referenced project — needs nothing but the source files.
 - actions: manually update the references in your projects and remove the redundant ones. A redundant package reference is worth a second look first: a version pinned on purpose is a reason to keep one. Packages the other project declares with 'PrivateAssets=all' are not reported, because those do not reach you.
 - where: because it is a dotnetcore console application, it runs on both windows and linux.
 - for whom: all dotnet c# developers creating solutions containing large amounts of projects.
@@ -20,6 +21,10 @@ The project references tool is a console application which scans your .cs projec
 ### What does it do
 - Example:
  
+	The structure of this example solution
+
+	![solution structure](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/Architecture-view-for-ProjectReferences.png)
+
 	If this is how the references in our project looks like (take note of the highlighted references).
 
 	![Redundant projects example](https://raw.githubusercontent.com/a3helmich/Konfidence.ProjectReferences/develop/readme/redundant-projects.PNG)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,6 +32,8 @@ public class RedundancyReport
 
             "No redundant project/package references found.".WriteLine();
 
+            RemoveReportFile();
+
             return;
         }
 
@@ -61,6 +64,28 @@ public class RedundancyReport
         {
             await WriteLine(reportFile, $"{Tab} + {redundantPackageReference}{PackageExtension}");
         }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private static void RemoveReportFile()
+    {
+        if (!File.Exists(ReportFileName))
+        {
+            return;
+        }
+
+        try
+        {
+            File.Delete(ReportFileName);
+        }
+        catch (IOException ioException)
+        {
+            $"could not remove '{ReportFileName}' : {ioException.Message}".WriteLine();
+
+            return;
+        }
+
+        $"removed => '{ReportFileName}'".WriteLine();
     }
 
     private static void WriteMissingPackageReferences(int projectsWithoutPackageReferences)
