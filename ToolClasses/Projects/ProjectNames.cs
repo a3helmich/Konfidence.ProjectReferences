@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Konfidence.Base;
 using ToolClasses.Readers;
 
@@ -26,11 +25,11 @@ public class ProjectNames
         return _applicationConfiguration.SolutionFile.IsAssigned() && !_applicationConfiguration.AllProjects;
     }
 
-    public async Task<List<string>> GetFullProjectNames()
+    public List<string> GetFullProjectNames()
     {
         if (ProjectNamesFromSolutionValid())
         {
-            return await _solutionReader.GetFullProjectNames();
+            return _solutionReader.GetFullProjectNames();
         }
 
         return GetProjectNames();

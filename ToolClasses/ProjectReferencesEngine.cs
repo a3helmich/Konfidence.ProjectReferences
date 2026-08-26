@@ -37,7 +37,7 @@ public class ProjectReferencesEngine
             return;
         }
 
-        List<string> projectNames = await _projectNames.GetFullProjectNames();
+        List<string> projectNames = _projectNames.GetFullProjectNames();
 
         _projectReader
             .Execute(projectNames)

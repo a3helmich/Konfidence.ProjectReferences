@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
@@ -42,20 +41,20 @@ public class ProjectNamesTests
     }
 
     [TestMethod]
-    public async Task GetFullProjectNames_WithAllProjectsSwitch_ReturnsEveryProjectBelowTheBasePath()
+    public void GetFullProjectNames_WithAllProjectsSwitch_ReturnsEveryProjectBelowTheBasePath()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
 
         // Act
-        List<string> projectNames = await context.ProjectNames.GetFullProjectNames();
+        List<string> projectNames = context.ProjectNames.GetFullProjectNames();
 
         // Assert
         CollectionAssert.AreEquivalent(new[] { ProjectFile("A"), ProjectFile("B"), ProjectFile("C") }, projectNames);
     }
 
     [TestMethod]
-    public async Task GetFullProjectNames_WithASolutionFile_ReturnsOnlyTheProjectsInThatSolution()
+    public void GetFullProjectNames_WithASolutionFile_ReturnsOnlyTheProjectsInThatSolution()
     {
         // Arrange
         WriteSolution("A", "B");
@@ -63,14 +62,14 @@ public class ProjectNamesTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
 
         // Act
-        List<string> projectNames = await context.ProjectNames.GetFullProjectNames();
+        List<string> projectNames = context.ProjectNames.GetFullProjectNames();
 
         // Assert
         CollectionAssert.AreEquivalent(new[] { ProjectFile("A"), ProjectFile("B") }, projectNames);
     }
 
     [TestMethod]
-    public async Task GetFullProjectNames_WithAllProjectsSwitch_IgnoresTheSolutionAndReturnsEveryProject()
+    public void GetFullProjectNames_WithAllProjectsSwitch_IgnoresTheSolutionAndReturnsEveryProject()
     {
         // Arrange
         WriteSolution("A", "B");
@@ -78,14 +77,14 @@ public class ProjectNamesTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName, "--AllProjects");
 
         // Act
-        List<string> projectNames = await context.ProjectNames.GetFullProjectNames();
+        List<string> projectNames = context.ProjectNames.GetFullProjectNames();
 
         // Assert
         CollectionAssert.AreEquivalent(new[] { ProjectFile("A"), ProjectFile("B"), ProjectFile("C") }, projectNames);
     }
 
     [TestMethod]
-    public async Task GetFullProjectNames_WithASolutionWithoutProjects_DoesNotFallBackToScanningTheBasePath()
+    public void GetFullProjectNames_WithASolutionWithoutProjects_DoesNotFallBackToScanningTheBasePath()
     {
         // Arrange
         WriteSolution();
@@ -93,14 +92,14 @@ public class ProjectNamesTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
 
         // Act
-        List<string> projectNames = await context.ProjectNames.GetFullProjectNames();
+        List<string> projectNames = context.ProjectNames.GetFullProjectNames();
 
         // Assert
         Assert.AreEqual(0, projectNames.Count);
     }
 
     [TestMethod]
-    public async Task GetFullProjectNames_WithASolutionThatHoldsOneProject_DoesNotFallBackToScanningTheBasePath()
+    public void GetFullProjectNames_WithASolutionThatHoldsOneProject_DoesNotFallBackToScanningTheBasePath()
     {
         // Arrange
         WriteSolution("A");
@@ -108,27 +107,27 @@ public class ProjectNamesTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
 
         // Act
-        List<string> projectNames = await context.ProjectNames.GetFullProjectNames();
+        List<string> projectNames = context.ProjectNames.GetFullProjectNames();
 
         // Assert
         CollectionAssert.AreEquivalent(new[] { ProjectFile("A") }, projectNames);
     }
 
     [TestMethod]
-    public async Task GetFullProjectNames_WithAllProjectsSwitch_ReturnsRootedPaths()
+    public void GetFullProjectNames_WithAllProjectsSwitch_ReturnsRootedPaths()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath, "--AllProjects");
 
         // Act
-        List<string> projectNames = await context.ProjectNames.GetFullProjectNames();
+        List<string> projectNames = context.ProjectNames.GetFullProjectNames();
 
         // Assert
         Assert.IsTrue(projectNames.All(Path.IsPathRooted), "expected every project name to be a full path");
     }
 
     [TestMethod]
-    public async Task GetFullProjectNames_WithASolutionFile_ReturnsRootedPaths()
+    public void GetFullProjectNames_WithASolutionFile_ReturnsRootedPaths()
     {
         // Arrange
         WriteSolution("A", "B");
@@ -136,7 +135,7 @@ public class ProjectNamesTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
 
         // Act
-        List<string> projectNames = await context.ProjectNames.GetFullProjectNames();
+        List<string> projectNames = context.ProjectNames.GetFullProjectNames();
 
         // Assert
         Assert.IsTrue(projectNames.All(Path.IsPathRooted), "expected every project name to be a full path");
