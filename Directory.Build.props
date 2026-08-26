@@ -17,7 +17,7 @@
 		<CLSCompliant>False</CLSCompliant>
 		<AssemblyCulture>en</AssemblyCulture>
 
-		<PackageOutputPath>$(SolutionDir)nuget</PackageOutputPath>
+		<PackageOutputPath>$(MSBuildThisFileDirectory)nuget</PackageOutputPath>
 
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/a3helmich/Konfidence.ProjectReferences</PackageProjectUrl>
@@ -30,6 +30,6 @@
 		<IncludeSymbols>false</IncludeSymbols>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Include="$(SolutionDir)README.md" Pack="true" PackagePath="\"/>
+		<None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\"/>
 	</ItemGroup>
 </Project>
