@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ToolClasses.ExtensionMethods;
@@ -36,7 +35,7 @@ public class SolutionReaderTests
     }
 
     [TestMethod]
-    public async Task Constructor_WithASolutionFile_ReadsTheProjectsInThatSolution()
+    public void Constructor_WithASolutionFile_ReadsTheProjectsInThatSolution()
     {
         // Arrange
         WriteSolution("A", "B");
@@ -45,13 +44,13 @@ public class SolutionReaderTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", SolutionName);
 
         // Assert
-        List<string> projectNames = await context.SolutionReader.GetFullProjectNames();
+        List<string> projectNames = context.SolutionReader.GetFullProjectNames();
 
         CollectionAssert.AreEquivalent(new[] { ProjectFile("A"), ProjectFile("B") }, projectNames);
     }
 
     [TestMethod]
-    public async Task Constructor_WithASlnxSolutionFile_ReadsTheProjectsInThatSolution()
+    public void Constructor_WithASlnxSolutionFile_ReadsTheProjectsInThatSolution()
     {
         // Arrange
         WriteSlnxSolution("A", "B");
@@ -60,13 +59,13 @@ public class SolutionReaderTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", $"{SolutionName}.slnx");
 
         // Assert
-        List<string> projectNames = await context.SolutionReader.GetFullProjectNames();
+        List<string> projectNames = context.SolutionReader.GetFullProjectNames();
 
         CollectionAssert.AreEquivalent(new[] { ProjectFile("A"), ProjectFile("B") }, projectNames);
     }
 
     [TestMethod]
-    public async Task Constructor_WithAMissingSolutionFile_DoesNotThrow()
+    public void Constructor_WithAMissingSolutionFile_DoesNotThrow()
     {
         // Arrange
         WriteSolution("A");
@@ -79,7 +78,7 @@ public class SolutionReaderTests
     }
 
     [TestMethod]
-    public async Task Constructor_WithAMissingSolutionFile_ReadsNoProjects()
+    public void Constructor_WithAMissingSolutionFile_ReadsNoProjects()
     {
         // Arrange
         WriteSolution("A");
@@ -87,20 +86,20 @@ public class SolutionReaderTests
         TestContext context = CreateContext("--BasePath", _basePath, "--solution", "Missing.sln");
 
         // Act
-        List<string> projectNames = await context.SolutionReader.GetFullProjectNames();
+        List<string> projectNames = context.SolutionReader.GetFullProjectNames();
 
         // Assert
         Assert.AreEqual(0, projectNames.Count);
     }
 
     [TestMethod]
-    public async Task Constructor_WithoutASolutionFile_ReadsNoProjects()
+    public void Constructor_WithoutASolutionFile_ReadsNoProjects()
     {
         // Arrange
         TestContext context = CreateContext("--BasePath", _basePath);
 
         // Act
-        List<string> projectNames = await context.SolutionReader.GetFullProjectNames();
+        List<string> projectNames = context.SolutionReader.GetFullProjectNames();
 
         // Assert
         Assert.AreEqual(0, projectNames.Count);

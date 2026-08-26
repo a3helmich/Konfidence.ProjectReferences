@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Konfidence.Base;
-using Microsoft.VisualStudio.SolutionPersistence;
-using Microsoft.VisualStudio.SolutionPersistence.Model;
-using Microsoft.VisualStudio.SolutionPersistence.Serializer;
+using Konfidence.MsBuild;
+using Konfidence.MsBuild.Solution;
 
 namespace ToolClasses.Readers;
 
@@ -22,7 +19,7 @@ public class SolutionReader
         _applicationConfiguration = applicationConfiguration;
     }
 
-    public async Task<List<string>> GetFullProjectNames()
+    public List<string> GetFullProjectNames()
     {
         string solutionFileName = GetSolutionFileName();
 
@@ -31,21 +28,14 @@ public class SolutionReader
             return [];
         }
 
-        ISolutionSerializer? serializer = SolutionSerializers.GetSerializerByMoniker(solutionFileName);
-
-        if (!serializer.IsAssigned())
-        {
-            return [];
-        }
-
-        SolutionModel solution = await serializer.OpenAsync(solutionFileName, CancellationToken.None);
+        SolutionDocument solution = SolutionDocument.GetSolutionDocument(solutionFileName);
 
         string solutionPath = Path.GetDirectoryName(solutionFileName) ?? string.Empty;
 
         List<string> fullProjectNames = solution
-            .SolutionProjects
+            .Projects
             .Where(IsDotNetProject)
-            .Select(solutionProject => Path.GetFullPath(Path.Combine(solutionPath, solutionProject.FilePath)))
+            .Select(solutionProject => Path.GetFullPath(Path.Combine(solutionPath, solutionProject.ProjectFile)))
             .ToList();
 
         return fullProjectNames;
@@ -61,8 +51,8 @@ public class SolutionReader
         return Path.Combine(_applicationConfiguration.BasePath, _applicationConfiguration.SolutionFile);
     }
 
-    private static bool IsDotNetProject(SolutionProjectModel solutionProject)
+    private static bool IsDotNetProject(SolutionProject solutionProject)
     {
-        return solutionProject.Extension.Equals(ProjectExtension, StringComparison.OrdinalIgnoreCase);
+        return Path.GetExtension(solutionProject.ProjectFile).Equals(ProjectExtension, StringComparison.OrdinalIgnoreCase);
     }
 }
