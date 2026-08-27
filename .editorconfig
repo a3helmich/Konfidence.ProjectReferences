@@ -1,6 +1,6 @@
 [*.cs]
 
-// builder configurations
+# builder configurations
 dotnet_diagnostic.CA1000.severity = warning
 
 csharp_style_prefer_primary_constructors = false
@@ -15,6 +15,6 @@ resharper_convert_to_primary_constructor_highlighting = none
 
 dotnet_diagnostic.IDE0290.severity = none
 
-// editor configurations
+# editor configurations
 trim_trailing_whitespace = true
 insert_final_newline = true
