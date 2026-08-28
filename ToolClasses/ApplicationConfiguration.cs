@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Konfidence.Base;
+using Konfidence.MsBuild;
 using Microsoft.Extensions.Configuration;
 using ToolClasses.ExtensionMethods;
 using ToolInterfaces;
@@ -10,10 +10,6 @@ namespace ToolClasses;
 
 public class ApplicationConfiguration
 {
-    private const string SolutionExtension = ".sln";
-
-    private const string SolutionXmlExtension = ".slnx";
-
     public string BasePath { get; }
 
     public string SolutionFile { get; }
@@ -67,22 +63,7 @@ public class ApplicationConfiguration
 
     private string ResolveSolutionFile(string solutionName)
     {
-        if (HasSolutionExtension(solutionName))
-        {
-            return solutionName;
-        }
-
-        string solutionFile = $"{solutionName}{SolutionExtension}";
-
-        return File.Exists(Path.Combine(BasePath, solutionFile))
-            ? solutionFile
-            : $"{solutionName}{SolutionXmlExtension}";
-    }
-
-    private static bool HasSolutionExtension(string solutionName)
-    {
-        return solutionName.EndsWith(SolutionExtension, StringComparison.OrdinalIgnoreCase)
-               || solutionName.EndsWith(SolutionXmlExtension, StringComparison.OrdinalIgnoreCase);
+        return Path.GetFileName(SolutionDocument.ResolveSolutionFilePath(BasePath, solutionName));
     }
 
     public bool ValidConfiguration()
