@@ -25,7 +25,7 @@ variables:
   - name: disable.coverage.autogenerate
     value: 'false'
   - name: solution
-    value: '**/*.sln'
+    value: '**/*.slnx'
   - name: buildConfiguration
     value: 'Release'
   - group: nuget.org-apikeys
