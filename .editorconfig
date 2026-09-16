@@ -15,6 +15,8 @@ resharper_convert_to_primary_constructor_highlighting = none
 
 dotnet_diagnostic.IDE0290.severity = none
 
+resharper_csharp_wrap_parameters_style = chop_always
+
 # editor configurations
 trim_trailing_whitespace = true
 insert_final_newline = true
