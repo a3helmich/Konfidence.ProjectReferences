@@ -29,8 +29,6 @@ variables:
   - name: buildConfiguration
     value: 'Release'
   - group: nuget.org-apikeys
-  - name: vNuGetApiKey
-    value: $[variables.NuGetApiKey]
   
 steps:
 - checkout: self
@@ -79,4 +77,4 @@ steps:
   inputs:
     command: custom
     custom: nuget
-    arguments: 'push $(Build.ArtifactStagingDirectory)\Konfidence.Project-References.*.nupkg -s https://api.nuget.org/v3/index.json -k $(vNuGetApiKey) --skip-duplicate'
+    arguments: 'push $(Build.ArtifactStagingDirectory)\Konfidence.Project-References.*.nupkg -s https://api.nuget.org/v3/index.json -k $(NuGetApiKey) --skip-duplicate'
